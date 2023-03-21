@@ -1,0 +1,57 @@
+{
+  "name": "@squad-lat/sbom-vscode-plugin",
+  "displayName": "squad-lat-sbom-vscode-plugin",
+  "description": "",
+  "version": "0.0.1",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.76.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "squad-lat-sbom.helloWorld",
+        "title": "Hello World"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "pnpm run compile && pnpm run lint",
+    "test": "node ./out/test/runTest.js",
+    "lint": "eslint src --ext ts",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "prepare": "husky install",
+    "clear:node-modules": "npx rimraf ./**/node_modules",
+    "clear:project": "pnpm run clear:node-modules",
+    "clear:project-and-install": "pnpm run clear:project && pnpm i"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.76.0",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@typescript-eslint/eslint-plugin": "^5.53.0",
+    "@typescript-eslint/parser": "^5.53.0",
+    "eslint": "^8.34.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "typescript": "^4.9.5",
+    "@vscode/test-electron": "^2.2.3",
+    "@commitlint/cli": "^17.0.2",
+    "@commitlint/config-conventional": "^17.0.2",
+    "commitlint-plugin-workspace-scopes": "^1.1.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.0.1",
+    "prettier": "^2.8.3",
+    "pretty-quick": "^3.1.3",
+    "rimraf": "^3.0.2"
+  }
+}
