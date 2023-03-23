@@ -38,6 +38,8 @@
     "clear:project-and-install": "pnpm clear:project && pnpm"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.5.0",
+    "@commitlint/config-conventional": "^17.4.4",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
@@ -46,9 +48,9 @@
     "@typescript-eslint/parser": "^5.53.0",
     "@vscode/test-electron": "^2.2.3",
     "eslint": "^8.34.0",
+    "husky": "^8.0.0",
     "mocha": "^10.2.0",
-    "typescript": "^4.9.5",
-    "husky": "^8.0.0"
+    "typescript": "^4.9.5"
   },
   "dependencies": {
     "scanoss": "^0.8.5"
