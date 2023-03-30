@@ -1,10 +1,13 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 import { scanFile } from './sdk-functions';
 
 // Registers the pasteApi command, which sends the selected text to the API
 export const scanPastedContentCommand = vscode.commands.registerCommand(
   'extension.scanPastedContentSdk',
-  () => {
+  async () => {
     const editor = vscode.window.activeTextEditor;
     const selection = editor?.selection;
 
@@ -14,7 +17,27 @@ export const scanPastedContentCommand = vscode.commands.registerCommand(
     }
 
     const content = editor.document.getText(selection);
-    scanFile(content);
+
+    try {
+      // Create a temporary file
+      const tmpDir = os.tmpdir();
+      const tmpFilename = `tmp-${Date.now()}.txt`;
+      const tmpFilepath = path.join(tmpDir, tmpFilename);
+
+      // Write the content to the temporary file
+      fs.writeFileSync(tmpFilepath, content, 'utf8');
+
+      // Run the scanFile function with the temporary file path
+      scanFile(tmpFilepath);
+
+      // Delete the temporary file
+      fs.unlinkSync(tmpFilepath);
+    } catch (error) {
+      vscode.window.showErrorMessage(
+        'An error occurred while processing the content.'
+      );
+      console.error(error);
+    }
   }
 );
 
