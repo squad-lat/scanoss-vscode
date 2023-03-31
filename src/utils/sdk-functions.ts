@@ -1,13 +1,21 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as path from 'path';
 import { Scanner } from 'scanoss';
+// import { findSBOMFile } from './sbom-functions';
 
 const scanner = new Scanner();
 
 // Executes the scanoss-js command for the specified file path and displays the results in a message
-export const scanFile = (filePath: string) => {
+export const scanFile = (filePath: string | Array<string>) => {
+  let filePaths = [];
+  if (typeof filePath === 'string') {
+    filePaths = [filePath];
+  } else {
+    filePaths = filePath;
+  }
   scanner
-    .scan([{ fileList: [filePath] }])
+    .scan([{ fileList: filePaths }])
     .then((resultPath) => {
       console.log('Path to results: ', resultPath);
 
@@ -43,51 +51,63 @@ export const scanPastedContent = async (
   prevText = event.document.getText();
 };
 
-// export const sendFileToApi = (filePath: string) => {
-//   const command = `scanoss-js scan ${filePath}`;
+export const collectFilePaths = async (
+  directoryPath: string,
+  filePaths: string[] = []
+) => {
+  const entries = fs.readdirSync(directoryPath, { withFileTypes: true });
 
-//   child_process.exec(command, (error, stdout, stderr) => {
-//     if (error) {
-//       vscode.window.showErrorMessage('Error running scan: ' + error.message);
-//       return;
-//     }
-//     if (stderr) {
-//       vscode.window.showErrorMessage('Error running scan: ' + stderr);
-//       return;
-//     }
+  for (const entry of entries) {
+    const entryPath = path.join(directoryPath, entry.name);
 
-//     const jsonOutput = JSON.parse(stdout);
-//     const scanResults = jsonOutput.scanner[filePath][0];
+    if (entry.isDirectory()) {
+      await collectFilePaths(entryPath, filePaths);
+    } else if (entry.isFile()) {
+      filePaths.push(entryPath);
+    }
+  }
 
-//     if (scanResults.id === "none") {
-//       vscode.window.showInformationMessage('No matches found.');
-//       return;
-//     }
+  return filePaths;
+};
+/**
+ * Formats the scan result object into a string
+ * @param scanResult - scan result object
+ * @returns formatted string
+ */
+const formatScanResult = (scanResult: any) => {
+  const matched = scanResult.matched;
+  const lines = scanResult.lines.split('-');
+  const startLine = parseInt(lines[0], 10) - 1;
+  const endLine = parseInt(lines[1], 10) - 1;
+  const file_url = scanResult.file_url;
+  const fileName = scanResult.file.split('/').pop();
 
-//     const matched = scanResults.matched;
-//     const lines = scanResults.lines.split('-');
-//     const startLine = parseInt(lines[0], 10) - 1;
-//     const endLine = parseInt(lines[1], 10) - 1;
-//     const file_url = scanResults.file_url;
-//     const fileName = filePath.split('/').pop();
+  const formattedOutput = `${fileName}:\n- Lines: ${startLine}-${endLine}\n- Matches: ${matched}\n- File URL: ${file_url}\n`;
 
-//     const formattedOutput = `${fileName}:\n- Lines: ${startLine}-${endLine}\n- Matches: ${matched}%\n- File url: ${file_url}`;
-//     vscode.window.showInformationMessage(formattedOutput);
+  return formattedOutput;
+};
 
-//     // Open the file and highlight the specified lines
-//     const fileUri = vscode.Uri.file(filePath);
-//     const highlightDecorationType = vscode.window.createTextEditorDecorationType({
-//       backgroundColor: 'rgba(255, 255, 0, 0.3)',
-//     });
+/**
+ * Highlights the matches in the active editor
+ * @param scanResult - scan result object
+ * @returns void
+ * @todo - add support for multiple matches
+ */
+const highlightMatches = (scanResult: any) => {
+  const lines = scanResult.lines.split('-');
+  const startLine = parseInt(lines[0], 10) - 1;
+  const endLine = parseInt(lines[1], 10) - 1;
 
-//     vscode.workspace.openTextDocument(fileUri).then((document) => {
-//       vscode.window.showTextDocument(document, { viewColumn: 1, preserveFocus: false, preview: false }).then((editor) => {
-//         const range = new vscode.Range(
-//           new vscode.Position(startLine, 0),
-//           new vscode.Position(endLine, Number.MAX_VALUE)
-//         );
-//         editor.setDecorations(highlightDecorationType, [range]);
-//       });
-//     });
-//   });
-// };
+  const editor = vscode.window.activeTextEditor;
+  const decorationType = vscode.window.createTextEditorDecorationType({
+    backgroundColor: 'rgba(255, 0, 0, 0.3)',
+  });
+
+  if (editor) {
+    const range = new vscode.Range(
+      new vscode.Position(startLine, 0),
+      new vscode.Position(endLine, 0)
+    );
+    editor.setDecorations(decorationType, [range]);
+  }
+};

@@ -2,9 +2,9 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { scanFile } from './sdk-functions';
+import { scanFile, collectFilePaths } from './sdk-functions';
 
-// Registers the pasteApi command, which sends the selected text to the API
+// Registers the scanPastedContentSdk command, which scans the content pasted into the editor
 export const scanPastedContentCommand = vscode.commands.registerCommand(
   'extension.scanPastedContentSdk',
   async () => {
@@ -57,10 +57,10 @@ export const scanFileCommand = vscode.commands.registerCommand(
   }
 );
 
-// Register the "scanProjectSdk" command, which scans the currently open project
+// Register the "scanProjectSdk" command, which scans the entire project
 export const scanProjectCommand = vscode.commands.registerCommand(
   'extension.scanProjectSdk',
-  () => {
+  async () => {
     const workspaceFolders = vscode.workspace.workspaceFolders;
 
     if (!workspaceFolders || workspaceFolders.length === 0) {
@@ -69,6 +69,15 @@ export const scanProjectCommand = vscode.commands.registerCommand(
     }
 
     const rootFolder = workspaceFolders[0].uri.fsPath;
-    scanFile(rootFolder);
+
+    try {
+      const filePaths = await collectFilePaths(rootFolder);
+      scanFile(filePaths);
+    } catch (error) {
+      vscode.window.showErrorMessage(
+        'An error occurred while scanning the project.'
+      );
+      console.error(error);
+    }
   }
 );
