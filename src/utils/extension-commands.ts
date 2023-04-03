@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { scanFile, collectFilePaths } from './sdk-functions';
+import { scanFiles, collectFilePaths } from './sdk-functions';
 
 // Registers the scanPastedContentSdk command, which scans the content pasted into the editor
 export const scanPastedContentCommand = vscode.commands.registerCommand(
@@ -28,7 +28,7 @@ export const scanPastedContentCommand = vscode.commands.registerCommand(
       fs.writeFileSync(tmpFilepath, content, 'utf8');
 
       // Run the scanFile function with the temporary file path
-      scanFile(tmpFilepath);
+      scanFiles([tmpFilepath]);
 
       // Delete the temporary file
       fs.unlinkSync(tmpFilepath);
@@ -53,7 +53,7 @@ export const scanFileCommand = vscode.commands.registerCommand(
     }
 
     const filePath = editor.document.uri.fsPath;
-    scanFile(filePath);
+    scanFiles([filePath]);
   }
 );
 
@@ -72,7 +72,7 @@ export const scanProjectCommand = vscode.commands.registerCommand(
 
     try {
       const filePaths = await collectFilePaths(rootFolder);
-      scanFile(filePaths);
+      scanFiles(filePaths);
     } catch (error) {
       vscode.window.showErrorMessage(
         'An error occurred while scanning the project.'

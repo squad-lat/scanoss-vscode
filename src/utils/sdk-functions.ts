@@ -7,15 +7,13 @@ import { Scanner } from 'scanoss';
 const scanner = new Scanner();
 
 // Executes the scanoss-js command for the specified file path and displays the results in a message
-export const scanFile = (filePath: string | Array<string>) => {
-  let filePaths = [];
-  if (typeof filePath === 'string') {
-    filePaths = [filePath];
-  } else {
-    filePaths = filePath;
-  }
+export const scanFile = (filePathsArray: Array<string>) => {
+  vscode.window.showInformationMessage(
+    "File(s) scanned: '" + filePathsArray + "'"
+  );
+
   scanner
-    .scan([{ fileList: filePaths }])
+    .scan([{ fileList: filePathsArray }])
     .then((resultPath) => {
       console.log('Path to results: ', resultPath);
 
@@ -27,7 +25,12 @@ export const scanFile = (filePath: string | Array<string>) => {
           );
           return;
         }
-        vscode.window.showInformationMessage('Scan result: ' + data);
+
+        // Display the scan result
+        vscode.window.showInformationMessage(data);
+
+        // Delete the scan result file
+        fs.unlinkSync(resultPath);
       });
     })
     .catch((error) => {
@@ -79,6 +82,7 @@ const formatScanResult = (scanResult: any) => {
   const lines = scanResult.lines.split('-');
   const startLine = parseInt(lines[0], 10) - 1;
   const endLine = parseInt(lines[1], 10) - 1;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const file_url = scanResult.file_url;
   const fileName = scanResult.file.split('/').pop();
 

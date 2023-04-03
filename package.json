@@ -15,8 +15,16 @@
   "contributes": {
     "commands": [
       {
+        "command": "extension.scanPastedContentSdk",
+        "title": "scan pasted content"
+      },
+      {
         "command": "extension.scanFileSdk",
         "title": "scan file"
+      },
+      {
+        "command":"extension.scanProjectSdk",
+        "title":"scan project"
       }
     ]
   },
