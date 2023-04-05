@@ -1,5 +1,7 @@
+import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { scanFiles, collectFilePaths } from './sdk-functions';
 
 export const findSBOMFile = async (dir: string): Promise<string | null> => {
   const entries = await fs.promises.readdir(dir, { withFileTypes: true });
@@ -19,4 +21,51 @@ export const findSBOMFile = async (dir: string): Promise<string | null> => {
   }
 
   return null;
+};
+
+export const checkSbomOnStartup = async (
+  workspaceFolders: readonly vscode.WorkspaceFolder[] | undefined
+) => {
+  if (!workspaceFolders || workspaceFolders.length === 0) {
+    vscode.window.showErrorMessage('No open workspace found.');
+    return;
+  }
+
+  const rootFolder = workspaceFolders[0].uri.fsPath;
+  const sbomExists = await findSBOMFile(rootFolder);
+
+  if (sbomExists) {
+    // Perform the scan if SBOM.js exists
+    const filePaths = await collectFilePaths(rootFolder);
+    scanFiles(filePaths);
+  } else {
+    // Ask the user to select an existing file or create a new blank one
+    const options: vscode.QuickPickItem[] = [
+      { label: 'Import existing SBOM.json' },
+      { label: 'Create new blank SBOM.json' },
+    ];
+
+    const selectedOption = await vscode.window.showQuickPick(options, {
+      placeHolder: 'No SBOM.json file found. Please choose an action.',
+    });
+
+    if (!selectedOption) {
+      return;
+    }
+
+    if (selectedOption.label === 'Import existing SBOM.json') {
+      const fileUri = await vscode.window.showOpenDialog({
+        canSelectFiles: true,
+        canSelectFolders: false,
+        canSelectMany: false,
+        filters: { JSON: ['json'] },
+      });
+
+      if (fileUri && fileUri[0]) {
+        fs.copyFileSync(fileUri[0].fsPath, path.join(rootFolder, 'SBOM.json'));
+      }
+    } else if (selectedOption.label === 'Create new blank SBOM.json') {
+      fs.writeFileSync(path.join(rootFolder, 'SBOM.json'), '');
+    }
+  }
 };
