@@ -21,34 +21,31 @@ export const scanFiles = (filePathsArray: Array<string>) => {
           );
           return;
         }
+        vscode.window.showInformationMessage(data);
 
         // Replace "none" values with "no match found"
-        const resultObject = JSON.parse(data);
+        // const resultObject = JSON.parse(data);
+        // for (const key in resultObject) {
+        // if (resultObject[key][0].id === 'none') {
+        //   const resultString = 'No match found';
+        //   vscode.window.showInformationMessage(resultString);
+        // } else {
+        //   let resultString = '';
+        //   const filePaths = Object.keys(resultObject);
+        //   filePaths.forEach((filePath) => {
+        //     const fileResults = resultObject[filePath][0];
 
-        for (const key in resultObject) {
-          vscode.window.showInformationMessage(key);
+        //     const parts = filePath.split('/');
+        //     const fileName = parts.pop();
 
-          vscode.window.showInformationMessage(resultObject[key]);
-          // if (resultObject[key][0].id === 'none') {
-          //   const resultString = 'No match found';
-          //   vscode.window.showInformationMessage(resultString);
-          // } else {
-          //   let resultString = '';
-          //   const filePaths = Object.keys(resultObject);
-          //   filePaths.forEach((filePath) => {
-          //     const fileResults = resultObject[filePath][0];
-
-          //     const parts = filePath.split('/');
-          //     const fileName = parts.pop();
-
-          //     const { matched, lines, url } = fileResults;
-          //     const formattedOutput = `\n${fileName}:\n- Lines: ${lines}\n- Matches: ${matched}\n- File URL: ${url}\n`;
-          //     resultString += formattedOutput;
-          //   });
-          //   // Display the modified scan result
-          //   vscode.window.showWarningMessage(resultString, 'showFullResult');
-          // }
-        }
+        //     const { matched, lines, url } = fileResults;
+        //     const formattedOutput = `\n${fileName}:\n- Lines: ${lines}\n- Matches: ${matched}\n- File URL: ${url}\n`;
+        //     resultString += formattedOutput;
+        //   });
+        //   // Display the modified scan result
+        //   vscode.window.showWarningMessage(resultString, 'showFullResult');
+        // }
+        // }
 
         // Delete the scan result file
         fs.unlinkSync(resultPath);
