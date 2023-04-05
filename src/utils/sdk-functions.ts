@@ -2,17 +2,17 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Scanner } from 'scanoss';
-// import { findSBOMFile } from './sbom-functions';
+import { highlightLines } from './editor-functions';
 
 const scanner = new Scanner();
 
-// Executes the scanoss-js command for the specified file path and displays the results in a message
-export const scanFiles = (filePathsArray: Array<string>) => {
+export const scanFiles = (
+  filePathsArray: Array<string>,
+  highlightErrors: boolean = false
+) => {
   scanner
     .scan([{ fileList: filePathsArray }])
     .then((resultPath) => {
-      console.log('Path to results: ', resultPath);
-
       // Read the scan result and display it
       fs.readFile(resultPath, 'utf-8', (err, data) => {
         if (err) {
@@ -21,31 +21,20 @@ export const scanFiles = (filePathsArray: Array<string>) => {
           );
           return;
         }
-        vscode.window.showInformationMessage(data);
 
-        // Replace "none" values with "no match found"
-        // const resultObject = JSON.parse(data);
-        // for (const key in resultObject) {
-        // if (resultObject[key][0].id === 'none') {
-        //   const resultString = 'No match found';
-        //   vscode.window.showInformationMessage(resultString);
-        // } else {
-        //   let resultString = '';
-        //   const filePaths = Object.keys(resultObject);
-        //   filePaths.forEach((filePath) => {
-        //     const fileResults = resultObject[filePath][0];
+        // Process the scan results
+        const scanResults = JSON.parse(data);
+        Object.entries(scanResults).forEach(
+          ([scannedFilePath, findings]: [string, any[]]) => {
+            findings.forEach((finding) => {
+              if (highlightErrors) {
+                highlightLines(scannedFilePath, finding.lines);
+              }
+            });
+          }
+        );
 
-        //     const parts = filePath.split('/');
-        //     const fileName = parts.pop();
-
-        //     const { matched, lines, url } = fileResults;
-        //     const formattedOutput = `\n${fileName}:\n- Lines: ${lines}\n- Matches: ${matched}\n- File URL: ${url}\n`;
-        //     resultString += formattedOutput;
-        //   });
-        //   // Display the modified scan result
-        //   vscode.window.showWarningMessage(resultString, 'showFullResult');
-        // }
-        // }
+        vscode.window.showInformationMessage('Scan completed.');
 
         // Delete the scan result file
         fs.unlinkSync(resultPath);

@@ -28,7 +28,7 @@ export const scanPastedContentCommand = vscode.commands.registerCommand(
       fs.writeFileSync(tmpFilepath, content, 'utf8');
 
       // Run the scanFile function with the temporary file path
-      scanFiles([tmpFilepath]);
+      scanFiles([tmpFilepath], true);
 
       // Delete the temporary file
       fs.unlinkSync(tmpFilepath);
@@ -40,6 +40,17 @@ export const scanPastedContentCommand = vscode.commands.registerCommand(
     }
   }
 );
+
+export const scanFileOnSave = async (document: vscode.TextDocument) => {
+  // Check if the saved document is the currently active editor
+  if (
+    vscode.window.activeTextEditor &&
+    document === vscode.window.activeTextEditor.document
+  ) {
+    // Call the scanFileCommand function for the saved document
+    scanFiles([document.uri.fsPath], true);
+  }
+};
 
 // Register the "scanFileSdk" command, which scans the currently open file
 export const scanFileCommand = vscode.commands.registerCommand(
@@ -53,7 +64,7 @@ export const scanFileCommand = vscode.commands.registerCommand(
     }
 
     const filePath = editor.document.uri.fsPath;
-    scanFiles([filePath]);
+    scanFiles([filePath], true);
   }
 );
 
