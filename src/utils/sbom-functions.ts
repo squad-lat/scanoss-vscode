@@ -3,6 +3,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { scanFiles, collectFilePaths } from './sdk-functions';
 
+/**
+ * Recursively searches for an SBOM.json file in the specified directory
+ * @param dir - path of the directory to search
+ * @returns the path of the found SBOM.json file or null if not found
+ */
 export const findSBOMFile = async (dir: string): Promise<string | null> => {
   const entries = await fs.promises.readdir(dir, { withFileTypes: true });
 
@@ -23,6 +28,12 @@ export const findSBOMFile = async (dir: string): Promise<string | null> => {
   return null;
 };
 
+/**
+ * Checks if an SBOM.json file exists in the workspace on startup.
+ * If found, scans the files in the workspace.
+ * If not found, prompts the user to import or create an SBOM.json file.
+ * @param workspaceFolders - array of workspace folders
+ */
 export const checkSbomOnStartup = async (
   workspaceFolders: readonly vscode.WorkspaceFolder[] | undefined
 ) => {

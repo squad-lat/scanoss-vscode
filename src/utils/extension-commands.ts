@@ -4,24 +4,25 @@ import * as os from 'os';
 import * as path from 'path';
 import { scanFiles, collectFilePaths } from './sdk-functions';
 
-// Registers the scanPastedContentSdk command, which scans the content pasted into the editor
+/**
+ * Scans pasted content
+ */
 export const scanPastedContentCommand = vscode.commands.registerCommand(
   'extension.scanPastedContentSdk',
-  async () => {
-    const editor = vscode.window.activeTextEditor;
-    const selection = editor?.selection;
-
-    if (!editor || !selection) {
-      vscode.window.showErrorMessage('No active editor found.');
+  async (content: string, fileExtension: string) => {
+    if (!content) {
+      vscode.window.showErrorMessage('No content provided.');
       return;
+    } else {
+      vscode.window.showInformationMessage(
+        'Scanning pasted content...' + content
+      );
     }
-
-    const content = editor.document.getText(selection);
 
     try {
       // Create a temporary file
       const tmpDir = os.tmpdir();
-      const tmpFilename = `tmp-${Date.now()}.txt`;
+      const tmpFilename = `sossTmp${Date.now()}${fileExtension}`;
       const tmpFilepath = path.join(tmpDir, tmpFilename);
 
       // Write the content to the temporary file
@@ -41,6 +42,10 @@ export const scanPastedContentCommand = vscode.commands.registerCommand(
   }
 );
 
+/**
+ * Scans the file being saved and highlights any errors found
+ * @param document - the text document being saved
+ */
 export const scanFileOnSave = async (document: vscode.TextDocument) => {
   // Check if the saved document is the currently active editor
   if (
@@ -52,7 +57,9 @@ export const scanFileOnSave = async (document: vscode.TextDocument) => {
   }
 };
 
-// Register the "scanFileSdk" command, which scans the currently open file
+/**
+ * Scans the currently open file and highlights any errors found
+ */
 export const scanFileCommand = vscode.commands.registerCommand(
   'extension.scanFileSdk',
   () => {
@@ -68,7 +75,9 @@ export const scanFileCommand = vscode.commands.registerCommand(
   }
 );
 
-// Register the "scanProjectSdk" command, which scans the entire project
+/**
+ * Scans the entire project
+ */
 export const scanProjectCommand = vscode.commands.registerCommand(
   'extension.scanProjectSdk',
   async () => {

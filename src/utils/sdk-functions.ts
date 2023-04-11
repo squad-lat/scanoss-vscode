@@ -6,6 +6,11 @@ import { highlightLines } from './editor-functions';
 
 const scanner = new Scanner();
 
+/**
+ * Scans the given files using the Scanner instance and highlights the lines with errors (if the highlightErrors flag is true)
+ * @param filePathsArray - array of file paths to scan
+ * @param highlightErrors - whether to highlight lines with errors (default is false)
+ */
 export const scanFiles = (
   filePathsArray: Array<string>,
   highlightErrors: boolean = false
@@ -34,7 +39,7 @@ export const scanFiles = (
           }
         );
 
-        vscode.window.showInformationMessage('Scan completed.');
+        vscode.window.showInformationMessage(`Scan completed: ${data}`);
 
         // Delete the scan result file
         fs.unlinkSync(resultPath);
@@ -45,22 +50,39 @@ export const scanFiles = (
     });
 };
 
+let prevText = '';
+
+/**
+ * Listens for changes in the text document and scans the pasted content if it's not blank
+ * @param event - text document change event
+ */
 export const scanPastedContent = async (
   event: vscode.TextDocumentChangeEvent
 ) => {
-  let prevText = '';
-
   if (prevText !== event.document.getText()) {
-    const clipboardContent = await vscode.env.clipboard.readText();
-    const change = event.contentChanges[0];
+    const clipboardContent = event.document.getText();
 
-    if (change?.text === clipboardContent) {
-      vscode.commands.executeCommand('extension.scanPastedContentSdk');
+    // Get the file extension of the modified document
+    const fileExtension = path.extname(event.document.fileName);
+
+    // Check if the clipboardContent is not blank before executing the command
+    if (clipboardContent.trim() !== '') {
+      vscode.commands.executeCommand(
+        'extension.scanPastedContentSdk',
+        clipboardContent,
+        fileExtension
+      );
     }
   }
   prevText = event.document.getText();
 };
 
+/**
+ * Recursively collects file paths from a given directory
+ * @param directoryPath - path of the directory to start collecting file paths
+ * @param filePaths - array of collected file paths (default is empty array)
+ * @returns array of file paths
+ */
 export const collectFilePaths = async (
   directoryPath: string,
   filePaths: string[] = []
@@ -79,6 +101,7 @@ export const collectFilePaths = async (
 
   return filePaths;
 };
+
 /**
  * Formats the scan result object into a string
  * @param scanResult - scan result object
@@ -96,29 +119,4 @@ const formatScanResult = (scanResult: any) => {
   const formattedOutput = `${fileName}:\n- Lines: ${startLine}-${endLine}\n- Matches: ${matched}\n- File URL: ${file_url}\n`;
 
   return formattedOutput;
-};
-
-/**
- * Highlights the matches in the active editor
- * @param scanResult - scan result object
- * @returns void
- * @todo - add support for multiple matches
- */
-const highlightMatches = (scanResult: any) => {
-  const lines = scanResult.lines.split('-');
-  const startLine = parseInt(lines[0], 10) - 1;
-  const endLine = parseInt(lines[1], 10) - 1;
-
-  const editor = vscode.window.activeTextEditor;
-  const decorationType = vscode.window.createTextEditorDecorationType({
-    backgroundColor: 'rgba(255, 0, 0, 0.3)',
-  });
-
-  if (editor) {
-    const range = new vscode.Range(
-      new vscode.Position(startLine, 0),
-      new vscode.Position(endLine, 0)
-    );
-    editor.setDecorations(decorationType, [range]);
-  }
 };
