@@ -15,12 +15,16 @@
   "contributes": {
     "commands": [
       {
-        "command": "extension.pasteApi",
-        "title": "Paste API"
+        "command": "extension.scanPastedContentSdk",
+        "title": "scan pasted content"
       },
       {
-        "command": "extension.sendFileApi",
-        "title": "Send file to API"
+        "command": "extension.scanFileSdk",
+        "title": "scan file"
+      },
+      {
+        "command":"extension.scanProjectSdk",
+        "title":"scan project"
       }
     ]
   },
@@ -50,13 +54,13 @@
     "eslint": "^8.34.0",
     "husky": "^8.0.0",
     "lint-staged": "^13.0.1",
+    "mocha": "^10.2.0",
     "prettier": "^2.8.3",
     "pretty-quick": "^3.1.3",
     "rimraf": "^3.0.2",
-    "mocha": "^10.2.0",
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "scanoss": "^0.8.5"
+    "scanoss": "^0.8.6"
   }
 }
