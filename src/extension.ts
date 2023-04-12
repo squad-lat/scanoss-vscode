@@ -3,6 +3,7 @@ import { scanFileOnSaveCommand } from './commands/scan-file-on-save.command';
 import { scanFileCommand } from './commands/scan-file.command';
 import { scanPastedContentCommand } from './commands/scan-pasted-content.command';
 import { scanOssButton } from './ui/buttons.status-bar';
+import { checkSbomOnStartup } from './utils/sbom';
 import { scanPastedContent } from './utils/sdk';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -10,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Runs the checkSbomOnStartup function when the extension is activated
   const workspaceFolders = vscode.workspace.workspaceFolders;
-  // checkSbomOnStartup(workspaceFolders);
+  checkSbomOnStartup(workspaceFolders);
 
   // Runs the scanPastedContent command when the user pastes content
   vscode.workspace.onDidChangeTextDocument((event) => {
