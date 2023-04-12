@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { scanFiles, collectFilePaths } from '../utils/sdk';
+import path from 'path';
 
 /**
  * Scans the entire project
