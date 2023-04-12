@@ -1,19 +1,17 @@
 import * as vscode from 'vscode';
 
-// Creates and displays a status bar item for the scanFileSdk command
-
-export const scanFileBtn = vscode.window.createStatusBarItem(
-  vscode.StatusBarAlignment.Right,
-  0
+vscode.commands.registerCommand(
+  'scanooss-operations.statusBarHandler',
+  async (...args) => {
+    vscode.window.showQuickPick(['hola', 'hola 2']);
+  }
 );
-scanFileBtn.text = '$(file-binary) Scan file';
-scanFileBtn.command = 'extension.scanFileSdk';
 
-// Creates and displays a status bar item for the scanFileSdk command
-
-export const scanProjectBtn = vscode.window.createStatusBarItem(
+export const scanOssButton = vscode.window.createStatusBarItem(
   vscode.StatusBarAlignment.Right,
-  0
+  1
 );
-scanProjectBtn.text = '$(file-directory) Scan project';
-scanProjectBtn.command = 'extension.scanProjectSdk';
+
+scanOssButton.text = '$(sync~spin) Iniciando ScanOSS';
+scanOssButton.tooltip = 'ScanOSS is running, click to show logs.';
+scanOssButton.command = 'scanooss-operations.statusBarHandler';
