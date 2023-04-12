@@ -14,7 +14,7 @@ export const scanProjectCommand = vscode.commands.registerCommand(
       return;
     }
 
-    const rootFolder = workspaceFolders[0].uri.fsPath;
+    const rootFolder = workspaceFolders[0]?.uri.fsPath as string
 
     try {
       const filePaths = await collectFilePaths(rootFolder);

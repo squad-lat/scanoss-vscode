@@ -42,7 +42,7 @@ export const checkSbomOnStartup = async (
     return;
   }
 
-  const rootFolder = workspaceFolders[0].uri.fsPath;
+  const rootFolder = workspaceFolders[0]?.uri.fsPath as string
   const sbomExists = await findSBOMFile(rootFolder);
 
   if (sbomExists) {
