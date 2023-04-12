@@ -1,12 +1,9 @@
 import * as vscode from 'vscode';
-import {
-  scanFileCommand,
-  scanPastedContentCommand,
-  scanFileOnSave,
-} from './utils/extension-commands';
-import { scanOssButton } from './ui/extension-buttons';
-import { checkSbomOnStartup } from './utils/sbom-functions';
-import { scanPastedContent } from './utils/sdk-functions';
+import { scanFileOnSaveCommand } from './commands/scan-file-on-save.command';
+import { scanFileCommand } from './commands/scan-file.command';
+import { scanPastedContentCommand } from './commands/scan-pasted-content.command';
+import { scanOssButton } from './ui/buttons.status-bar';
+import { scanPastedContent } from './utils/sdk';
 
 export function activate(context: vscode.ExtensionContext) {
   scanOssButton.show();
@@ -28,7 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
       document === vscode.window.activeTextEditor.document
     ) {
       // Call the scanFileCommand function for the saved document
-      scanFileOnSave(document);
+      scanFileOnSaveCommand(document);
     }
   });
 

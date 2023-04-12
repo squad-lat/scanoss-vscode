@@ -1,8 +1,8 @@
-import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Scanner } from 'scanoss';
-import { highlightLines } from './editor-functions';
+import * as vscode from 'vscode';
+import { highlightLines } from '../ui/highlight.editor';
 
 const scanner = new Scanner();
 

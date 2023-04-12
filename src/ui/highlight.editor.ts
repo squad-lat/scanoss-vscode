@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+
 const activeDecorations: Map<string, vscode.TextEditorDecorationType> =
   new Map();
 

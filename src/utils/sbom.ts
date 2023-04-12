@@ -1,7 +1,7 @@
-import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { scanFiles, collectFilePaths } from './sdk-functions';
+import * as vscode from 'vscode';
+import { scanFiles, collectFilePaths } from './sdk';
 
 /**
  * Recursively searches for an sbom.json file in the specified directory
