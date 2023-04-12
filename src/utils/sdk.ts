@@ -27,9 +27,17 @@ export const scanFiles = (
           return;
         }
 
+        vscode.window.showInformationMessage(`Scan completed: ${data}`);
+
+        // scanResults is an object with the file paths as keys and an array of findings as values
+        type ScanResult = {
+          [scannedFilePath: string]: any[];
+        };
+
         // Process the scan results
         const scanResults = JSON.parse(data);
-        Object.entries(scanResults).forEach(
+
+        Object.entries(scanResults as ScanResult).forEach(
           ([scannedFilePath, findings]: [string, any[]]) => {
             findings.forEach((finding) => {
               if (highlightErrors) {
@@ -38,8 +46,6 @@ export const scanFiles = (
             });
           }
         );
-
-        vscode.window.showInformationMessage(`Scan completed: ${data}`);
 
         // Delete the scan result file
         fs.unlinkSync(resultPath);
@@ -102,21 +108,21 @@ export const collectFilePaths = async (
   return filePaths;
 };
 
-/**
- * Formats the scan result object into a string
- * @param scanResult - scan result object
- * @returns formatted string
- */
-const formatScanResult = (scanResult: any) => {
-  const matched = scanResult.matched;
-  const lines = scanResult.lines.split('-');
-  const startLine = parseInt(lines[0], 10) - 1;
-  const endLine = parseInt(lines[1], 10) - 1;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const file_url = scanResult.file_url;
-  const fileName = scanResult.file.split('/').pop();
+// /**
+//  * Formats the scan result object into a string
+//  * @param scanResult - scan result object
+//  * @returns formatted string
+//  */
+// const formatScanResult = (scanResult: any) => {
+//   const matched = scanResult.matched;
+//   const lines = scanResult.lines.split('-');
+//   const startLine = parseInt(lines[0], 10) - 1;
+//   const endLine = parseInt(lines[1], 10) - 1;
+//   // eslint-disable-next-line @typescript-eslint/naming-convention
+//   const file_url = scanResult.file_url;
+//   const fileName = scanResult.file.split('/').pop();
 
-  const formattedOutput = `${fileName}:\n- Lines: ${startLine}-${endLine}\n- Matches: ${matched}\n- File URL: ${file_url}\n`;
+//   const formattedOutput = `${fileName}:\n- Lines: ${startLine}-${endLine}\n- Matches: ${matched}\n- File URL: ${file_url}\n`;
 
-  return formattedOutput;
-};
+//   return formattedOutput;
+// };

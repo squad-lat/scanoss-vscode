@@ -14,4 +14,5 @@ export const scanOssButton = vscode.window.createStatusBarItem(
 
 scanOssButton.text = '$(sync~spin) Iniciando ScanOSS';
 scanOssButton.tooltip = 'ScanOSS is running, click to show logs.';
-scanOssButton.command = 'extension.statusBarHandler';
+// scanOssButton.command = 'extension.statusBarHandler';
+scanOssButton.command = 'extension.scanFileSdk';

@@ -3,6 +3,7 @@ import { scanFileOnSaveCommand } from './commands/scan-file-on-save.command';
 import { scanFileCommand } from './commands/scan-file.command';
 import { scanPastedContentCommand } from './commands/scan-pasted-content.command';
 import { scanOssButton } from './ui/buttons.status-bar';
+import { removeAllHighlights } from './ui/highlight.editor';
 import { checkSbomOnStartup } from './utils/sbom';
 import { scanPastedContent } from './utils/sdk';
 
@@ -16,6 +17,11 @@ export function activate(context: vscode.ExtensionContext) {
   // Runs the scanPastedContent command when the user pastes content
   vscode.workspace.onDidChangeTextDocument((event) => {
     scanPastedContent(event);
+  });
+
+  // Runs the scanPastedContent command when the user pastes content
+  vscode.workspace.onDidChangeTextDocument(() => {
+    removeAllHighlights();
   });
 
   // Register an event listener for the onDidSave event

@@ -42,18 +42,15 @@ export const checkSbomOnStartup = async (
     return;
   }
 
-  const rootFolder = workspaceFolders[0]?.uri.fsPath as string
+  const rootFolder = workspaceFolders[0]?.uri.fsPath as string;
   const sbomExists = await findSBOMFile(rootFolder);
 
-  if (sbomExists) {
-    // Perform the scan if sbom.js exists
-    const filePaths = await collectFilePaths(rootFolder);
-    scanFiles(filePaths);
-  } else {
+  if (!sbomExists) {
     // Ask the user to select an existing file or create a new blank one
     const options: vscode.QuickPickItem[] = [
       { label: 'Import existing sbom.json' },
       { label: 'Create new blank sbom.json' },
+      { label: 'Perform project scan and create SBOM.json' },
     ];
 
     const selectedOption = await vscode.window.showQuickPick(options, {
@@ -76,6 +73,12 @@ export const checkSbomOnStartup = async (
         fs.copyFileSync(fileUri[0].fsPath, path.join(rootFolder, 'sbom.json'));
       }
     } else if (selectedOption.label === 'Create new blank sbom.json') {
+      fs.writeFileSync(path.join(rootFolder, 'sbom.json'), '');
+    } else if (
+      selectedOption.label === 'Perform project scan and create SBOM.json'
+    ) {
+      const filePaths = await collectFilePaths(rootFolder);
+      scanFiles(filePaths);
       fs.writeFileSync(path.join(rootFolder, 'sbom.json'), '');
     }
   }
