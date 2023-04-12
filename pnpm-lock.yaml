@@ -24,11 +24,11 @@ specifiers:
   prettier: ^2.8.4
   pretty-quick: ^3.1.3
   rimraf: ^4.1.2
-  scanoss: ^0.8.6
+  scanoss: ^0.8.7
   typescript: ^4.9.5
 
 dependencies:
-  scanoss: 0.8.6
+  scanoss: 0.8.7
 
 devDependencies:
   '@changesets/cli': 2.26.1
@@ -5547,10 +5547,10 @@ packages:
       }
     dev: false
 
-  /scanoss/0.8.6:
+  /scanoss/0.8.7:
     resolution:
       {
-        integrity: sha512-eMlmvg/yks4Wce2Vf45+SJt7wioTq7fsXs+4I1ht/XVEC0bZa5ECm/njtZEOmU4xP6n3kmzjNQqNbaC5mdPSUQ==,
+        integrity: sha512-QUIuLJ9idm3IIFnYg4bSgi67cXR++tizwnwoX1T3lvMoGB62TtvUP736sG5hTleNMXKw8KQTlU9LlUd9X9VqUw==,
       }
     engines: { node: '>=10' }
     hasBin: true
