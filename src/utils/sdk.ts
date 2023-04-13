@@ -22,7 +22,7 @@ export const scanFiles = async (
 
   if (!sbomFile) {
     vscode.window.showErrorMessage(
-      'No sbom.json file found. Please create one and try again.'
+      'No SBOM.json file found. Please create one and try again.'
     );
     return;
   }

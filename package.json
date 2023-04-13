@@ -36,7 +36,7 @@
     "viewsWelcome": [
       {
         "view": "scanoss-explorer",
-        "contents": "The project has not been scanned yet! Perform your first scan now to get started.\n[Scan Project](command:extension.scanProject)\nTo customize Project Scan, review its sbom.json file.\n[Learn more](https://blog.scanoss.com/2023/03/23/sbom-essentials-enhancing-security-and-compliance-with-scanoss/) about the sbom.json file and its operation."
+        "contents": "The project has not been scanned yet! Perform your first scan now to get started.\n[Scan Project](command:extension.scanProject)\nTo customize Project Scan, review its SBOM.json file.\n[Learn more](https://blog.scanoss.com/2023/03/23/sbom-essentials-enhancing-security-and-compliance-with-scanoss/) about the SBOM.json file and its operation."
       }
     ],
     "commands": [
