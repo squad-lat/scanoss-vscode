@@ -3,11 +3,7 @@ import * as vscode from 'vscode';
 const activeDecorations: Map<string, vscode.TextEditorDecorationType> =
   new Map();
 
-export const highlightLines = (
-  filePath: string,
-  lines: string,
-  message: string
-) => {
+export const highlightLines = (filePath: string, lines: string) => {
   const editor = vscode.window.visibleTextEditors.find(
     (editor) => editor.document.uri.fsPath === filePath
   );

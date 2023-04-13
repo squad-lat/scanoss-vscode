@@ -3,6 +3,7 @@ import * as path from 'path';
 import { Scanner } from 'scanoss';
 import * as vscode from 'vscode';
 import { highlightLines } from '../ui/highlight.editor';
+import { findSBOMFile } from './sbom';
 
 const scanner = new Scanner();
 
@@ -11,12 +12,23 @@ const scanner = new Scanner();
  * @param filePathsArray - array of file paths to scan
  * @param highlightErrors - whether to highlight lines with errors (default is false)
  */
-export const scanFiles = (
+export const scanFiles = async (
   filePathsArray: Array<string>,
   highlightErrors: boolean = false
 ) => {
+  const rootFolder = vscode.workspace.workspaceFolders?.[0].uri
+    .fsPath as string;
+  const sbomFile = await findSBOMFile(rootFolder);
+
+  if (!sbomFile) {
+    vscode.window.showErrorMessage(
+      'No sbom.json file found. Please create one and try again.'
+    );
+    return;
+  }
+
   scanner
-    .scan([{ fileList: filePathsArray }])
+    .scan([{ fileList: filePathsArray, sbom: sbomFile }])
     .then((resultPath) => {
       // Read the scan result and display it
       fs.readFile(resultPath, 'utf-8', (err, data) => {
