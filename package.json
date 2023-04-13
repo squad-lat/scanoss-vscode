@@ -68,7 +68,7 @@
     "pretest": "pnpm run compile && pnpm run lint",
     "lint": "eslint \"./**/*.{ts,tsx}\" --fix",
     "type-check": "tsc --noEmit",
-    "test": "echo 'no tests, yet... 😈",
+    "test": "node ./out/test/runTest.js",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "prepare": "husky install",
     "pre-commit": "pretty-quick --staged",

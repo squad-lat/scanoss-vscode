@@ -6,7 +6,7 @@
     "lib": ["ES2020"],
     "sourceMap": true,
     "rootDir": "src",
-    "esModuleInterop": true,
     "strict": true
-  }
+  },
+  "ignore": ["node_modules", ".vscode-test"]
 }
