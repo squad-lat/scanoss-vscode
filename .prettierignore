@@ -1,6 +1,11 @@
 .*rc
 *rc.js
 *.config.js
-cities.json
-countries.json
-states.json
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage

@@ -1,5 +1,6 @@
 {
-  "name": "@squad-lat/scanoss-vscode",
+  "name": "vscode-plugin",
+  "publisher": "scann-oss",
   "displayName": "scanoss-vscode",
   "version": "0.0.1",
   "engines": {
@@ -13,18 +14,50 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "scanoss",
+          "title": "ScanOSS",
+          "icon": "media/scanoss.svg"
+        }
+      ]
+    },
+    "views": {
+      "scanoss": [
+        {
+          "id": "scanoss-explorer",
+          "name": "Project Explorer",
+          "icon": "media/scanoss.svg",
+          "contextualTitle": "Package Explorer"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "scanoss-explorer",
+        "contents": "The project has not been scanned yet! Perform your first scan now to get started.\n[Scan Project](command:extension.scanProject)\nTo customize Project Scan, review its SBOM.json file.\n[Learn more](https://blog.scanoss.com/2023/03/23/sbom-essentials-enhancing-security-and-compliance-with-scanoss/) about the SBOM.json file and its operation."
+      }
+    ],
     "commands": [
       {
-        "command": "extension.scanPastedContentSdk",
-        "title": "scan pasted content"
+        "command": "extension.scanPastedContent",
+        "title": "ScanOSS: Scan Pasted Content"
       },
       {
-        "command": "extension.scanFileSdk",
-        "title": "scan file"
+        "command": "extension.scanFile",
+        "title": "ScanOSS: Scan File"
       },
       {
-        "command":"extension.scanProjectSdk",
-        "title":"scan project"
+        "command": "extension.scanProject",
+        "title": "ScanOSS: Scan Project"
+      }
+    ],
+    "productIconThemes": [
+      {
+        "id": "aliensAreBack",
+        "label": "Aliens Are Back",
+        "path": "./producticons/aliens-product-icon-theme.json"
       }
     ]
   },
@@ -33,15 +66,19 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "pnpm run compile && pnpm run lint",
-    "lint": "eslint src --ext ts",
+    "lint": "eslint \"./**/*.{ts,tsx}\" --fix",
+    "type-check": "tsc --noEmit",
+    "test": "echo 'no tests, yet... 😈",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "prepare": "husky install",
-    "clear:node-modules": "npx rimraf ./**/node_modules",
-    "clear:builds": "npx rimraf ./**/.next && npx rimraf ./**/.expo",
-    "clear:project": "pnpm clear:node-modules && pnpm clear:builds",
-    "clear:project-and-install": "pnpm clear:project && pnpm"
+    "pre-commit": "pretty-quick --staged",
+    "clear:node-modules": "npm exec -- npx rimraf node_modules && npx rimraf node_modules",
+    "clear:builds": "npm exec -- npx rimraf out",
+    "clear:project": "pnpm run clear:node-modules && pnpm run clear:builds",
+    "clear:project-and-install": "pnpm run clear:project && pnpm run"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.26.0",
     "@commitlint/cli": "^17.5.0",
     "@commitlint/config-conventional": "^17.4.4",
     "@types/glob": "^8.1.0",
@@ -51,16 +88,22 @@
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
     "@vscode/test-electron": "^2.2.3",
+    "commitlint-plugin-workspace-scopes": "^1.1.0",
     "eslint": "^8.34.0",
-    "husky": "^8.0.0",
-    "lint-staged": "^13.0.1",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-turbo": "latest",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.0",
     "mocha": "^10.2.0",
-    "prettier": "^2.8.3",
+    "prettier": "^2.8.4",
     "pretty-quick": "^3.1.3",
-    "rimraf": "^3.0.2",
+    "rimraf": "^4.1.2",
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "scanoss": "^0.8.6"
+    "scanoss": "^0.8.7"
   }
 }

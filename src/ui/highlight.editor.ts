@@ -1,13 +1,8 @@
 import * as vscode from 'vscode';
+
 const activeDecorations: Map<string, vscode.TextEditorDecorationType> =
   new Map();
 
-/**
- * Highlights lines in the specified file
- * @param filePath - path of the file to be highlighted
- * @param lines - string representing the range of lines to highlight (e.g. "1-4")
- * @returns undefined
- */
 export const highlightLines = (filePath: string, lines: string) => {
   const editor = vscode.window.visibleTextEditors.find(
     (editor) => editor.document.uri.fsPath === filePath
@@ -44,4 +39,18 @@ export const highlightLines = (filePath: string, lines: string) => {
 
   // Store the new decoration type in the map
   activeDecorations.set(filePath, decorationType);
+};
+
+export const removeAllHighlights = () => {
+  for (const [filePath, decorationType] of activeDecorations.entries()) {
+    const editor = vscode.window.visibleTextEditors.find(
+      (editor) => editor.document.uri.fsPath === filePath
+    );
+
+    if (editor) {
+      editor.setDecorations(decorationType, []);
+      decorationType.dispose();
+    }
+  }
+  activeDecorations.clear();
 };

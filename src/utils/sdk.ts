@@ -1,8 +1,9 @@
-import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Scanner } from 'scanoss';
-import { highlightLines } from './editor-functions';
+import * as vscode from 'vscode';
+import { highlightLines } from '../ui/highlight.editor';
+import { findSBOMFile } from './sbom';
 
 const scanner = new Scanner();
 
@@ -12,42 +13,64 @@ const scanner = new Scanner();
  * @param highlightErrors - whether to highlight lines with errors (default is false)
  */
 export const scanFiles = (
-  filePathsArray: Array<string>,
-  highlightErrors: boolean = false
-) => {
-  scanner
-    .scan([{ fileList: filePathsArray }])
-    .then((resultPath) => {
-      // Read the scan result and display it
-      fs.readFile(resultPath, 'utf-8', (err, data) => {
-        if (err) {
-          vscode.window.showErrorMessage(
-            'Error reading scan result: ' + err.message
-          );
-          return;
-        }
+  filePathsArray: string[],
+  highlightErrors = false
+): Promise<any[]> => {
+  return new Promise(async (resolve) => {
+    const rootFolder = vscode.workspace.workspaceFolders?.[0].uri
+      .fsPath as string;
+    const sbomFile = await findSBOMFile(rootFolder);
 
-        // Process the scan results
-        const scanResults = JSON.parse(data);
-        Object.entries(scanResults).forEach(
-          ([scannedFilePath, findings]: [string, any[]]) => {
-            findings.forEach((finding) => {
-              if (highlightErrors) {
-                highlightLines(scannedFilePath, finding.lines);
-              }
-            });
+    if (!sbomFile) {
+      vscode.window.showErrorMessage(
+        'No SBOM.json file found. Please create one and try again.'
+      );
+      return;
+    }
+
+    scanner
+      .scan([{ fileList: filePathsArray, sbom: sbomFile }])
+      .then((resultPath) => {
+        // Read the scan result and display it
+        fs.readFile(resultPath, 'utf-8', (err, data) => {
+          if (err) {
+            vscode.window.showErrorMessage(
+              'Error reading scan result: ' + err.message
+            );
+            return;
           }
-        );
 
-        vscode.window.showInformationMessage(`Scan completed: ${data}`);
+          vscode.window.showInformationMessage(`Scan completed: ${data}`);
 
-        // Delete the scan result file
-        fs.unlinkSync(resultPath);
+          // scanResults is an object with the file paths as keys and an array of findings as values
+          type ScanResult = {
+            [scannedFilePath: string]: any[];
+          };
+
+          // Process the scan results
+          const scanResults = JSON.parse(data);
+
+          Object.entries(scanResults as ScanResult).forEach(
+            ([scannedFilePath, findings]: [string, any[]]) => {
+              findings.forEach((finding) => {
+                if (highlightErrors) {
+                  highlightLines(scannedFilePath, finding.lines);
+                }
+              });
+            }
+          );
+
+          console.log('Scan result file deleted.', scanResults);
+          // Delete the scan result file
+          fs.unlinkSync(resultPath);
+
+          resolve(scanResults);
+        });
+      })
+      .catch((error) => {
+        vscode.window.showErrorMessage('Error running scan: ' + error.message);
       });
-    })
-    .catch((error) => {
-      vscode.window.showErrorMessage('Error running scan: ' + error.message);
-    });
+  });
 };
 
 let prevText = '';
@@ -100,23 +123,4 @@ export const collectFilePaths = async (
   }
 
   return filePaths;
-};
-
-/**
- * Formats the scan result object into a string
- * @param scanResult - scan result object
- * @returns formatted string
- */
-const formatScanResult = (scanResult: any) => {
-  const matched = scanResult.matched;
-  const lines = scanResult.lines.split('-');
-  const startLine = parseInt(lines[0], 10) - 1;
-  const endLine = parseInt(lines[1], 10) - 1;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const file_url = scanResult.file_url;
-  const fileName = scanResult.file.split('/').pop();
-
-  const formattedOutput = `${fileName}:\n- Lines: ${startLine}-${endLine}\n- Matches: ${matched}\n- File URL: ${file_url}\n`;
-
-  return formattedOutput;
 };

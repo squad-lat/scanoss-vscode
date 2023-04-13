@@ -1,12 +1,11 @@
 import * as vscode from 'vscode';
-import {
-  scanFileCommand,
-  scanPastedContentCommand,
-  scanFileOnSave,
-} from './utils/extension-commands';
-import { scanFileBtn, scanProjectBtn } from './ui/extension-buttons';
-import { checkSbomOnStartup } from './utils/sbom-functions';
-import { scanPastedContent } from './utils/sdk-functions';
+import { scanFileOnSaveCommand } from './commands/scan-file-on-save.command';
+import { scanFileCommand } from './commands/scan-file.command';
+import { scanPastedContentCommand } from './commands/scan-pasted-content.command';
+import { scanProjectCommand } from './commands/scan-project.command';
+import { removeAllHighlights } from './ui/highlight.editor';
+import { checkSbomOnStartup } from './utils/sbom';
+import { scanPastedContent } from './utils/sdk';
 
 export function activate(context: vscode.ExtensionContext) {
   // Runs the checkSbomOnStartup function when the extension is activated
@@ -18,6 +17,11 @@ export function activate(context: vscode.ExtensionContext) {
     scanPastedContent(event);
   });
 
+  // Runs the scanPastedContent command when the user pastes content
+  vscode.workspace.onDidChangeTextDocument(() => {
+    removeAllHighlights();
+  });
+
   // Register an event listener for the onDidSave event
   vscode.workspace.onDidSaveTextDocument((document) => {
     // Check if the saved document is the currently active editor
@@ -26,16 +30,16 @@ export function activate(context: vscode.ExtensionContext) {
       document === vscode.window.activeTextEditor.document
     ) {
       // Call the scanFileCommand function for the saved document
-      scanFileOnSave(document);
+      scanFileOnSaveCommand(document);
     }
   });
 
-  // Displays the scanFileSdk button
-  scanFileBtn.show();
-  scanProjectBtn.show();
-
   // Adds the registered commands to the extension's context
-  context.subscriptions.push(scanFileCommand, scanPastedContentCommand);
+  context.subscriptions.push(
+    scanFileCommand,
+    scanPastedContentCommand,
+    scanProjectCommand
+  );
 }
 
 export function deactivate() {

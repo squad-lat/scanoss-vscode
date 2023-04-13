@@ -1,0 +1,8 @@
+node_modules
+build
+coverage
+__stories__
+__tests__
+.eslintrc.js
+.babel.config.js
+package.json
