@@ -1,10 +1,13 @@
+import * as path from 'path';
 import * as vscode from 'vscode';
 
 const activeDecorations = new Map<string, vscode.TextEditorDecorationType>();
 
 export const highlightLines = (filePath: string, lines: string) => {
+  const normalizedFilePath = path.normalize(filePath);
   const editor = vscode.window.visibleTextEditors.find(
-    (editor) => editor.document.uri.fsPath === filePath
+    (editor) =>
+      path.normalize(editor.document.uri.fsPath) === normalizedFilePath
   );
 
   if (!editor) {
