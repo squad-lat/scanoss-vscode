@@ -12,60 +12,65 @@ const scanner = new Scanner();
  * @param filePathsArray - array of file paths to scan
  * @param highlightErrors - whether to highlight lines with errors (default is false)
  */
-export const scanFiles = async (
-  filePathsArray: Array<string>,
-  highlightErrors: boolean = false
-) => {
-  const rootFolder = vscode.workspace.workspaceFolders?.[0].uri
-    .fsPath as string;
-  const sbomFile = await findSBOMFile(rootFolder);
+export const scanFiles = (
+  filePathsArray: string[],
+  highlightErrors = false
+): Promise<any[]> => {
+  return new Promise(async (resolve, reject) => {
+    const rootFolder = vscode.workspace.workspaceFolders?.[0].uri
+      .fsPath as string;
+    const sbomFile = await findSBOMFile(rootFolder);
 
-  if (!sbomFile) {
-    vscode.window.showErrorMessage(
-      'No SBOM.json file found. Please create one and try again.'
-    );
-    return;
-  }
+    if (!sbomFile) {
+      vscode.window.showErrorMessage(
+        'No SBOM.json file found. Please create one and try again.'
+      );
+      return;
+    }
 
-  scanner
-    .scan([{ fileList: filePathsArray, sbom: sbomFile }])
-    .then((resultPath) => {
-      // Read the scan result and display it
-      fs.readFile(resultPath, 'utf-8', (err, data) => {
-        if (err) {
-          vscode.window.showErrorMessage(
-            'Error reading scan result: ' + err.message
-          );
-          return;
-        }
-
-        vscode.window.showInformationMessage(`Scan completed: ${data}`);
-
-        // scanResults is an object with the file paths as keys and an array of findings as values
-        type ScanResult = {
-          [scannedFilePath: string]: any[];
-        };
-
-        // Process the scan results
-        const scanResults = JSON.parse(data);
-
-        Object.entries(scanResults as ScanResult).forEach(
-          ([scannedFilePath, findings]: [string, any[]]) => {
-            findings.forEach((finding) => {
-              if (highlightErrors) {
-                highlightLines(scannedFilePath, finding.lines);
-              }
-            });
+    scanner
+      .scan([{ fileList: filePathsArray, sbom: sbomFile }])
+      .then((resultPath) => {
+        // Read the scan result and display it
+        fs.readFile(resultPath, 'utf-8', (err, data) => {
+          if (err) {
+            vscode.window.showErrorMessage(
+              'Error reading scan result: ' + err.message
+            );
+            return;
           }
-        );
 
-        // Delete the scan result file
-        fs.unlinkSync(resultPath);
+          vscode.window.showInformationMessage(`Scan completed: ${data}`);
+
+          // scanResults is an object with the file paths as keys and an array of findings as values
+          type ScanResult = {
+            [scannedFilePath: string]: any[];
+          };
+
+          // Process the scan results
+          const scanResults = JSON.parse(data);
+
+          Object.entries(scanResults as ScanResult).forEach(
+            ([scannedFilePath, findings]: [string, any[]]) => {
+              findings.forEach((finding) => {
+                if (highlightErrors) {
+                  highlightLines(scannedFilePath, finding.lines);
+                }
+              });
+            }
+          );
+
+          console.log('Scan result file deleted.', scanResults);
+          // Delete the scan result file
+          fs.unlinkSync(resultPath);
+
+          resolve(scanResults);
+        });
+      })
+      .catch((error) => {
+        vscode.window.showErrorMessage('Error running scan: ' + error.message);
       });
-    })
-    .catch((error) => {
-      vscode.window.showErrorMessage('Error running scan: ' + error.message);
-    });
+  });
 };
 
 let prevText = '';

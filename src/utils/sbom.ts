@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { scanFiles, collectFilePaths } from './sdk';
@@ -93,7 +94,7 @@ export const checkSbomOnStartup = async (
         creationInfo: {
           creators: [
             'Tool: SCANOSS Vscode Extension',
-            `Person: ${githubUsername}`,
+            `Person: ${os.userInfo().username}`,
           ],
           created: new Date().toISOString(),
         },

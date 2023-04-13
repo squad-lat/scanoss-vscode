@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import {
   showErrorButton,
@@ -5,6 +7,7 @@ import {
   showProcessButton,
 } from '../ui/buttons.status-bar';
 import { collectFilePaths, scanFiles } from '../utils/sdk';
+import { SpdxLiteJson } from '../utils/SpdxLite';
 
 export const scanProjectCommand = vscode.commands.registerCommand(
   'extension.scanProject',
@@ -21,7 +24,16 @@ export const scanProjectCommand = vscode.commands.registerCommand(
 
     try {
       const filePaths = await collectFilePaths(rootFolder);
-      scanFiles(filePaths);
+      const scanResults = await scanFiles(filePaths);
+
+      // Create the SPDX Lite JSON file
+      const spdxLiteJson = new SpdxLiteJson(scanResults);
+      const spdxData = await spdxLiteJson.generate();
+
+      // Save the SPDX Lite JSON file
+      const spdxFileName = 'SBOM.json';
+      fs.writeFileSync(path.join(rootFolder, spdxFileName), spdxData);
+
       showOkButton();
     } catch (error) {
       showErrorButton();
