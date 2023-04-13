@@ -16,7 +16,7 @@ export const scanFiles = (
   filePathsArray: string[],
   highlightErrors = false
 ): Promise<any[]> => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async (resolve) => {
     const rootFolder = vscode.workspace.workspaceFolders?.[0].uri
       .fsPath as string;
     const sbomFile = await findSBOMFile(rootFolder);
@@ -124,22 +124,3 @@ export const collectFilePaths = async (
 
   return filePaths;
 };
-
-// /**
-//  * Formats the scan result object into a string
-//  * @param scanResult - scan result object
-//  * @returns formatted string
-//  */
-// const formatScanResult = (scanResult: any) => {
-//   const matched = scanResult.matched;
-//   const lines = scanResult.lines.split('-');
-//   const startLine = parseInt(lines[0], 10) - 1;
-//   const endLine = parseInt(lines[1], 10) - 1;
-//   // eslint-disable-next-line @typescript-eslint/naming-convention
-//   const file_url = scanResult.file_url;
-//   const fileName = scanResult.file.split('/').pop();
-
-//   const formattedOutput = `${fileName}:\n- Lines: ${startLine}-${endLine}\n- Matches: ${matched}\n- File URL: ${file_url}\n`;
-
-//   return formattedOutput;
-// };

@@ -1,15 +1,22 @@
 import * as crypto from 'crypto';
-import * as os from 'os';
-
+import { generateSbomTemplate } from './sbom';
 export class SpdxLiteJson {
   private source: any;
 
+  /**
+   * Constructor for the SpdxLiteJson class.
+   * @param source - Source data object to generate SPDX Lite JSON from.
+   */
   constructor(source: any) {
     this.source = source;
   }
 
+  /**
+   * Generates an SPDX Lite JSON document based on the provided source data.
+   * @returns SPDX Lite JSON document as a string.
+   */
   public async generate() {
-    const spdx = this.template();
+    const spdx = generateSbomTemplate();
     spdx.packages = [];
     spdx.documentDescribes = [];
 
@@ -34,26 +41,11 @@ export class SpdxLiteJson {
     return JSON.stringify(spdx, undefined, 4);
   }
 
-  private template() {
-    const spdx = {
-      spdxVersion: 'SPDX-2.2',
-      dataLicense: 'CC0-1.0',
-      SPDXID: 'SPDXRef-###',
-      name: 'SCANOSS-SBOM',
-      documentNamespace: 'https://spdx.dev/spdx-specification-20-web-version/',
-      creationInfo: {
-        creators: [
-          'Tool: SCANOSS Vscode Extension',
-          `Person: ${os.userInfo().username}`,
-        ],
-        created: new Date().toISOString(),
-      },
-      packages: [] as any,
-      documentDescribes: [] as any,
-    };
-    return spdx;
-  }
-
+  /**
+   * Generates a package object based on the provided data.
+   * @param data - An object containing package data.
+   * @returns {object} - The package object.
+   */
   private getPackage(data: any) {
     const pkg: any = {};
     pkg.name = data.component;
