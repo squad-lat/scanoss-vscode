@@ -2,14 +2,12 @@ import * as vscode from 'vscode';
 import { scanFileOnSaveCommand } from './commands/scan-file-on-save.command';
 import { scanFileCommand } from './commands/scan-file.command';
 import { scanPastedContentCommand } from './commands/scan-pasted-content.command';
-import { scanOssButton } from './ui/buttons.status-bar';
+import { scanProjectCommand } from './commands/scan-project.command';
 import { removeAllHighlights } from './ui/highlight.editor';
 import { checkSbomOnStartup } from './utils/sbom';
 import { scanPastedContent } from './utils/sdk';
 
 export function activate(context: vscode.ExtensionContext) {
-  scanOssButton.show();
-
   // Runs the checkSbomOnStartup function when the extension is activated
   const workspaceFolders = vscode.workspace.workspaceFolders;
   checkSbomOnStartup(workspaceFolders);
@@ -36,10 +34,12 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
-  scanOssButton.text = '$(file-binary)';
-
   // Adds the registered commands to the extension's context
-  context.subscriptions.push(scanFileCommand, scanPastedContentCommand);
+  context.subscriptions.push(
+    scanFileCommand,
+    scanPastedContentCommand,
+    scanProjectCommand
+  );
 }
 
 export function deactivate() {

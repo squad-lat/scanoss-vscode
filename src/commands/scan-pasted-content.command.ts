@@ -8,7 +8,7 @@ import { scanFiles } from '../utils/sdk';
  * Scans pasted content
  */
 export const scanPastedContentCommand = vscode.commands.registerCommand(
-  'extension.scanPastedContentSdk',
+  'extension.scanPastedContent',
   async (content: string, fileExtension: string) => {
     if (!content) {
       vscode.window.showErrorMessage('No content provided.');

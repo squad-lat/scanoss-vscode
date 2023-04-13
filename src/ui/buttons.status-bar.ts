@@ -1,18 +1,44 @@
 import * as vscode from 'vscode';
 
-vscode.commands.registerCommand(
-  'extension.statusBarHandler',
-  async (...args) => {
-    vscode.window.showQuickPick(['hola', 'hola 2']);
-  }
-);
-
-export const scanOssButton = vscode.window.createStatusBarItem(
+export const mainButton = vscode.window.createStatusBarItem(
   vscode.StatusBarAlignment.Right,
   1
 );
 
-scanOssButton.text = '$(sync~spin) Iniciando ScanOSS';
-scanOssButton.tooltip = 'ScanOSS is running, click to show logs.';
-// scanOssButton.command = 'extension.statusBarHandler';
-scanOssButton.command = 'extension.scanFileSdk';
+export const initializeButton = () => {
+  mainButton.hide();
+  mainButton.text = '$(sync~spin) Iniciando ScanOSS';
+  mainButton.tooltip = 'ScanOSS is starting.';
+  mainButton.command = 'extension.scanFileSdk';
+  mainButton.show();
+};
+
+export const showErrorButton = () => {
+  mainButton.hide();
+  mainButton.text = '$(error) ScanOSS';
+  mainButton.tooltip = 'ScanOSS is running, click to show logs.';
+  mainButton.command = 'extension.scanFileSdk';
+  mainButton.backgroundColor = new vscode.ThemeColor(
+    'statusBarItem.errorBackground'
+  );
+  mainButton.show();
+};
+
+export const showProcessButton = () => {
+  console.log('Process');
+  mainButton.hide();
+  mainButton.text = '$(sync~spin) Scanning';
+  mainButton.tooltip = 'ScanOSS is running the scan.';
+  mainButton.command = 'extension.scanFileSdk';
+  mainButton.show();
+};
+
+export const showOkButton = () => {
+  setTimeout(() => {
+    console.log('OK');
+    mainButton.hide();
+    mainButton.text = 'ScanOSS';
+    mainButton.command = 'extension.scanFileSdk';
+    mainButton.show();
+  }, 2000);
+};

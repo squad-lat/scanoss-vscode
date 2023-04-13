@@ -1,12 +1,15 @@
 import * as vscode from 'vscode';
-import { scanFiles, collectFilePaths } from '../utils/sdk';
+import {
+  showErrorButton,
+  showOkButton,
+  showProcessButton,
+} from '../ui/buttons.status-bar';
+import { collectFilePaths, scanFiles } from '../utils/sdk';
 
-/**
- * Scans the entire project
- */
 export const scanProjectCommand = vscode.commands.registerCommand(
-  'extension.scanProjectSdk',
+  'extension.scanProject',
   async () => {
+    showProcessButton();
     const workspaceFolders = vscode.workspace.workspaceFolders;
 
     if (!workspaceFolders || workspaceFolders.length === 0) {
@@ -19,9 +22,11 @@ export const scanProjectCommand = vscode.commands.registerCommand(
     try {
       const filePaths = await collectFilePaths(rootFolder);
       scanFiles(filePaths);
+      showOkButton();
     } catch (error) {
+      showErrorButton();
       vscode.window.showErrorMessage(
-        'An error occurred while scanning the project.'
+        'An error occurred while scanning the project perrito.'
       );
       console.error(error);
     }

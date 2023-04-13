@@ -27,7 +27,7 @@
       "scanoss": [
         {
           "id": "scanoss-explorer",
-          "name": "",
+          "name": "Project Explorer",
           "icon": "media/scanoss.svg",
           "contextualTitle": "Package Explorer"
         }
@@ -36,21 +36,21 @@
     "viewsWelcome": [
       {
         "view": "scanoss-explorer",
-        "contents": "The project has not been scanned yet! Perform your first scan now to get started.\n[Scan Project](command:nodeDependencies.addEntry)\nTo customize Project Scan, review its sbom.json file.\n[Learn more](https://blog.scanoss.com/2023/03/23/sbom-essentials-enhancing-security-and-compliance-with-scanoss/) about the sbom.json file and its operation."
+        "contents": "The project has not been scanned yet! Perform your first scan now to get started.\n[Scan Project](command:extension.scanProject)\nTo customize Project Scan, review its sbom.json file.\n[Learn more](https://blog.scanoss.com/2023/03/23/sbom-essentials-enhancing-security-and-compliance-with-scanoss/) about the sbom.json file and its operation."
       }
     ],
     "commands": [
       {
-        "command": "extension.scanPastedContentSdk",
-        "title": "scan pasted content"
+        "command": "extension.scanPastedContent",
+        "title": "ScanOSS: Scan Pasted Content"
       },
       {
-        "command": "extension.scanFileSdk",
-        "title": "scan file"
+        "command": "extension.scanFile",
+        "title": "ScanOSS: Scan File"
       },
       {
-        "command": "extension.scanProjectSdk",
-        "title": "scan project"
+        "command": "extension.scanProject",
+        "title": "ScanOSS: Scan Project"
       }
     ],
     "productIconThemes": [
