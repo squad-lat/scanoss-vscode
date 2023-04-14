@@ -1,6 +1,6 @@
 import * as crypto from 'crypto';
-import { generateSbomTemplate } from './sbom';
 import * as vscode from 'vscode';
+import { generateSbomTemplate } from './sbom';
 
 export class SpdxLiteJson {
   private source: any;
