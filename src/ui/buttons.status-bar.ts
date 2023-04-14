@@ -32,7 +32,7 @@ export const showProcessButton = () => {
   mainButton.show();
 };
 
-export const showOkButton = () => {
+export const showDoneButton = () => {
   setTimeout(() => {
     console.log('OK');
     mainButton.hide();
