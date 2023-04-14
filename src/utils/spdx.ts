@@ -1,20 +1,13 @@
 import * as crypto from 'crypto';
 import { generateSbomTemplate } from './sbom';
+
 export class SpdxLiteJson {
   private source: any;
 
-  /**
-   * Constructor for the SpdxLiteJson class.
-   * @param source - Source data object to generate SPDX Lite JSON from.
-   */
   constructor(source: any) {
     this.source = source;
   }
 
-  /**
-   * Generates an SPDX Lite JSON document based on the provided source data.
-   * @returns SPDX Lite JSON document as a string.
-   */
   public async generate() {
     const spdx = generateSbomTemplate();
     spdx.packages = [];
@@ -41,11 +34,6 @@ export class SpdxLiteJson {
     return JSON.stringify(spdx, undefined, 4);
   }
 
-  /**
-   * Generates a package object based on the provided data.
-   * @param data - An object containing package data.
-   * @returns {object} - The package object.
-   */
   private getPackage(data: any) {
     const pkg: any = {};
     pkg.name = data.component;

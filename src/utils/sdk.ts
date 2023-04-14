@@ -2,96 +2,110 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Scanner } from 'scanoss';
 import * as vscode from 'vscode';
-import { highlightLines } from '../ui/highlight.editor';
-import { findSBOMFile } from './sbom';
+import { checkIfSbomExists } from './sbom';
 
-const scanner = new Scanner();
+export const getRootProjectFolder = async () => {
+  const workspaceFolders = vscode.workspace.workspaceFolders;
 
-/**
- * Scans the given files using the Scanner instance and highlights the lines with errors (if the highlightErrors flag is true)
- * @param filePathsArray - array of file paths to scan
- * @param highlightErrors - whether to highlight lines with errors (default is false)
- */
-export const scanFiles = (
+  if (workspaceFolders) {
+    return workspaceFolders[0].uri.fsPath as string;
+  }
+
+  throw new Error(`No open workspace found.`);
+};
+
+export const scanFiles = async (
   filePathsArray: string[],
   highlightErrors = false
-): Promise<any[]> => {
-  return new Promise(async (resolve) => {
-    const rootFolder = vscode.workspace.workspaceFolders?.[0].uri
-      .fsPath as string;
-    const sbomFile = await findSBOMFile(rootFolder);
+): Promise<void> => {
+  try {
+    const scanner = new Scanner();
+    const sbomFile = await checkIfSbomExists();
+    const rootFolder = await getRootProjectFolder();
 
-    if (!sbomFile) {
-      vscode.window.showErrorMessage(
-        'No SBOM.json file found. Please create one and try again.'
-      );
-      return;
+    const resultPath = await scanner.scan([
+      {
+        fileList: filePathsArray,
+        sbom: sbomFile.path,
+      },
+    ]);
+
+    if (resultPath) {
+      fs.readFile(resultPath, 'utf-8', (err, data) => {
+        const dirname = `${rootFolder}/.scanoss`;
+
+        if (!fs.existsSync(dirname)) {
+          fs.mkdirSync(dirname, { recursive: true });
+        }
+
+        fs.writeFileSync(path.join(dirname, 'sbom.temp.json'), data, 'utf-8');
+      });
     }
 
-    scanner
-      .scan([{ fileList: filePathsArray, sbom: sbomFile }])
-      .then((resultPath) => {
-        // Read the scan result and display it
-        fs.readFile(resultPath, 'utf-8', (err, data) => {
-          if (err) {
-            vscode.window.showErrorMessage(
-              'Error reading scan result: ' + err.message
-            );
-            return;
-          }
+    return Promise.resolve();
 
-          vscode.window.showInformationMessage(`Scan completed: ${data}`);
+    /* return new Promise(async (resolve) => {
+      const sbomFile = await checkIfSbomExists();
 
-          // scanResults is an object with the file paths as keys and an array of findings as values
-          type ScanResult = {
-            [scannedFilePath: string]: any[];
-          };
-
-          // Process the scan results
-          const scanResults = JSON.parse(data);
-
-          Object.entries(scanResults as ScanResult).forEach(
-            ([scannedFilePath, findings]: [string, any[]]) => {
-              findings.forEach((finding) => {
-                if (highlightErrors) {
-                  highlightLines(scannedFilePath, finding.lines);
-                }
-              });
+      scanner
+        .scan([{ fileList: filePathsArray, sbom: sbomFile.path }])
+        .then((resultPath) => {
+          fs.readFile(resultPath, 'utf-8', (err, data) => {
+            if (err) {
+              vscode.window.showErrorMessage(
+                'Error reading scan result: ' + err.message
+              );
+              return;
             }
+
+            vscode.window.showInformationMessage(`Scan completed: ${data}`);
+
+            type ScanResult = {
+              [scannedFilePath: string]: any[];
+            };
+
+            const scanResults = JSON.parse(data);
+
+            Object.entries(scanResults as ScanResult).forEach(
+              ([scannedFilePath, findings]: [string, any[]]) => {
+                findings.forEach((finding) => {
+                  if (highlightErrors) {
+                    highlightLines(scannedFilePath, finding.lines);
+                  }
+                });
+              }
+            );
+
+            console.log('Scan result file deleted.', scanResults);
+            fs.unlinkSync(resultPath);
+
+            resolve(scanResults);
+          });
+        })
+        .catch((error) => {
+          vscode.window.showErrorMessage(
+            'Error running scan: ' + error.message
           );
-
-          console.log('Scan result file deleted.', scanResults);
-          // Delete the scan result file
-          fs.unlinkSync(resultPath);
-
-          resolve(scanResults);
         });
-      })
-      .catch((error) => {
-        vscode.window.showErrorMessage('Error running scan: ' + error.message);
-      });
-  });
+    }); */
+  } catch (error) {
+    throw new Error(`An error occurred while scanning the files.`);
+  }
 };
 
 let prevText = '';
 
-/**
- * Listens for changes in the text document and scans the pasted content if it's not blank
- * @param event - text document change event
- */
 export const scanPastedContent = async (
   event: vscode.TextDocumentChangeEvent
 ) => {
   if (prevText !== event.document.getText()) {
     const clipboardContent = event.document.getText();
 
-    // Get the file extension of the modified document
     const fileExtension = path.extname(event.document.fileName);
 
-    // Check if the clipboardContent is not blank before executing the command
     if (clipboardContent.trim() !== '') {
       vscode.commands.executeCommand(
-        'extension.scanPastedContentSdk',
+        'extension.scanPastedContent',
         clipboardContent,
         fileExtension
       );
@@ -100,27 +114,25 @@ export const scanPastedContent = async (
   prevText = event.document.getText();
 };
 
-/**
- * Recursively collects file paths from a given directory
- * @param directoryPath - path of the directory to start collecting file paths
- * @param filePaths - array of collected file paths (default is empty array)
- * @returns array of file paths
- */
 export const collectFilePaths = async (
   directoryPath: string,
   filePaths: string[] = []
 ) => {
-  const entries = fs.readdirSync(directoryPath, { withFileTypes: true });
+  try {
+    const entries = fs.readdirSync(directoryPath, { withFileTypes: true });
 
-  for (const entry of entries) {
-    const entryPath = path.join(directoryPath, entry.name);
+    for (const entry of entries) {
+      const entryPath = path.join(directoryPath, entry.name);
 
-    if (entry.isDirectory()) {
-      await collectFilePaths(entryPath, filePaths);
-    } else if (entry.isFile()) {
-      filePaths.push(entryPath);
+      if (entry.isDirectory()) {
+        await collectFilePaths(entryPath, filePaths);
+      } else if (entry.isFile()) {
+        filePaths.push(entryPath);
+      }
     }
-  }
 
-  return filePaths;
+    return filePaths;
+  } catch (error) {
+    throw new Error(`An error occurred while collecting the file paths`);
+  }
 };

@@ -25,7 +25,6 @@ export const showErrorButton = () => {
 };
 
 export const showProcessButton = () => {
-  console.log('Process');
   mainButton.hide();
   mainButton.text = '$(sync~spin) Scanning';
   mainButton.tooltip = 'ScanOSS is running the scan.';
