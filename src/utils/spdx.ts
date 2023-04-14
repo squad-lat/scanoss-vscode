@@ -55,6 +55,7 @@ export class SpdxLiteJson {
         referenceType: 'purl',
       },
     ];
+
     return pkg;
   }
 }

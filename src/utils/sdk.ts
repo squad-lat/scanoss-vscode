@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Scanner } from 'scanoss';
 import * as vscode from 'vscode';
+import { highlightLines } from '../ui/highlight.editor';
 import { checkIfSbomExists } from './sbom';
 
 export const getRootProjectFolder = async () => {
@@ -42,9 +43,9 @@ export const scanFiles = async (
       });
     }
 
-    return Promise.resolve();
+    // return Promise.resolve();
 
-    /* return new Promise(async (resolve) => {
+    return new Promise(async (resolve) => {
       const sbomFile = await checkIfSbomExists();
 
       scanner
@@ -75,8 +76,6 @@ export const scanFiles = async (
                 });
               }
             );
-
-            console.log('Scan result file deleted.', scanResults);
             fs.unlinkSync(resultPath);
 
             resolve(scanResults);
@@ -87,7 +86,7 @@ export const scanFiles = async (
             'Error running scan: ' + error.message
           );
         });
-    }); */
+    });
   } catch (error) {
     throw new Error(`An error occurred while scanning the files.`);
   }

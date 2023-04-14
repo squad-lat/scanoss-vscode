@@ -4,7 +4,7 @@ import { Scanner } from 'scanoss';
 import * as vscode from 'vscode';
 import {
   showErrorButton,
-  showOkButton,
+  showDoneButton,
   showProcessButton,
 } from '../ui/buttons.status-bar';
 import { checkIfSbomExists } from '../utils/sbom';
@@ -31,6 +31,12 @@ export const scanProjectCommand = vscode.commands.registerCommand(
 
       if (resultPath) {
         fs.readFile(resultPath, 'utf-8', async (err, data) => {
+          if (err) {
+            throw new Error(
+              `An error occurred while trying to read the temporary file`
+            );
+          }
+
           const dirname = `${rootFolder}/.scanoss`;
 
           if (!fs.existsSync(dirname)) {
@@ -38,6 +44,7 @@ export const scanProjectCommand = vscode.commands.registerCommand(
           }
 
           fs.writeFileSync(path.join(dirname, 'sbom.temp.json'), data, 'utf-8');
+          showDoneButton();
 
           const optionSelected = await vscode.window.showInformationMessage(
             'Do you want to update your local sbom.json file with the scan results?',
@@ -45,6 +52,8 @@ export const scanProjectCommand = vscode.commands.registerCommand(
           );
 
           if (optionSelected === 'Update') {
+            showProcessButton();
+
             const spdxLiteJson = new SpdxLiteJson(JSON.parse(data));
             const spdxData = await spdxLiteJson.generate();
 
@@ -59,7 +68,7 @@ export const scanProjectCommand = vscode.commands.registerCommand(
                 'Updated sbom.json file successfully.'
               );
 
-              showOkButton();
+              showDoneButton();
             } catch (error) {
               vscode.window.showErrorMessage(
                 'An error occurred while trying to update the sbom.json file'
