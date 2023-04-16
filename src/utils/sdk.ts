@@ -32,11 +32,9 @@ export const scanFiles = async (
     ]);
 
     if (resultPath) {
-      fs.readFile(resultPath, 'utf-8', async (err, data) => {
-        if (err) {
-          console.error(`Error reading scan result: ${err.message}`);
-          return;
-        }
+      try {
+        const document = await vscode.workspace.openTextDocument(resultPath);
+        const data = document.getText();
 
         const dirname = `${rootFolder}/.scanoss`;
 
@@ -60,7 +58,9 @@ export const scanFiles = async (
             }
           }
         }
-      });
+      } catch (error: any) {
+        console.error(`Error reading scan result: ${error.message}`);
+      }
     }
 
     return Promise.resolve();
