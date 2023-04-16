@@ -10,7 +10,7 @@ import {
 import {
   getDependencyTree,
   getDependenciesFromNpmLs,
-} from '../utils/dependencyTree';
+} from '../utils/dependency-tree';
 import { checkIfSbomExists } from '../utils/sbom';
 import { collectFilePaths, getRootProjectFolder } from '../utils/sdk';
 import { generateSpdxLite } from '../utils/spdx';
@@ -95,8 +95,6 @@ export const scanProjectCommand = vscode.commands.registerCommand(
           }
         });
       }
-
-      // return Promise.reject();
     } catch (error) {
       showErrorButton();
       const optionSelected = await vscode.window.showErrorMessage(

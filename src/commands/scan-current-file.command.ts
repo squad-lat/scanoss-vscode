@@ -1,11 +1,8 @@
 import * as vscode from 'vscode';
 import { scanFiles } from '../utils/sdk';
 
-/**
- * Scans the currently open file and highlights any errors found
- */
-export const scanFileCommand = vscode.commands.registerCommand(
-  'extension.scanFile',
+export const scanCurrentFileCommand = vscode.commands.registerCommand(
+  'extension.scanCurrentFile',
   () => {
     const editor = vscode.window.activeTextEditor;
 

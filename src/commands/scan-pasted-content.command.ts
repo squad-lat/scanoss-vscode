@@ -4,9 +4,6 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { scanFiles } from '../utils/sdk';
 
-/**
- * Scans pasted content
- */
 export const scanPastedContentCommand = vscode.commands.registerCommand(
   'extension.scanPastedContent',
   async (content: string, fileExtension: string) => {
@@ -28,7 +25,7 @@ export const scanPastedContentCommand = vscode.commands.registerCommand(
       // Write the content to the temporary file
       fs.writeFileSync(tmpFilepath, content, 'utf8');
 
-      // Run the scanFile function with the temporary file path
+      // Run the scanCurrentFile function with the temporary file path
       scanFiles([tmpFilepath], true);
 
       // Delete the temporary file

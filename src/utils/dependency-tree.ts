@@ -1,6 +1,6 @@
 import { buildDepTreeFromFiles } from 'snyk-nodejs-lockfile-parser';
-import { getRootProjectFolder } from './sdk';
 import * as vscode from 'vscode';
+import { getRootProjectFolder } from './sdk';
 
 export const getDependencyTree = async () => {
   const lockFile = await getLockFile();
@@ -41,7 +41,7 @@ export const getDependenciesFromNpmLs = async (dependencyTree: any) => {
       if (!tree.dependencies) return;
 
       for (const [name, data] of Object.entries(tree.dependencies)) {
-        const version = data.version;
+        const version = (data as any).version;
         const id = `${name}@${version}`;
         const purl = `pkg:npm/${name}@${version}`;
 

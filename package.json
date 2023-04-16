@@ -16,12 +16,9 @@
   "contributes": {
     "commands": [
       {
-        "command": "extension.scanPastedContent",
-        "title": "ScanOSS: Scan Pasted Content"
-      },
-      {
-        "command": "extension.scanFile",
-        "title": "ScanOSS: Scan File"
+        "command": "extension.scanCurrentFile",
+        "title": "ScanOSS: Scan Current File",
+        "enablement": "resource"
       },
       {
         "command": "extension.scanProject",
@@ -72,6 +69,8 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "scanoss": "^0.8.7"
+    "cosmiconfig": "^8.1.3",
+    "scanoss": "^0.8.7",
+    "snyk-nodejs-lockfile-parser": "^1.48.3"
   }
 }
