@@ -5,6 +5,7 @@ import { scanFileOnSaveCommand } from './commands/scan-file-on-save.command';
 import { scanPastedContentCommand } from './commands/scan-pasted-content.command';
 import { scanProjectCommand } from './commands/scan-project.command';
 import { removeAllHighlights } from './ui/highlight.editor';
+
 import { checkRcConfigurationFile, checkSbomFile } from './utils/config';
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -16,24 +17,26 @@ export async function activate(context: vscode.ExtensionContext) {
   } else {
     const { config } = await checkRcConfigurationFile();
 
-    if (config.watch) {
-      await checkSbomFile();
-    }
+    if (config) {
+      if (config.watch) {
+        await checkSbomFile();
+      }
 
-    // TODO: Revisar este metodo. @agus
-    if (config.scanOnSave) {
-      vscode.workspace.onDidChangeTextDocument(() => {
-        removeAllHighlights();
-      });
+      // TODO: Revisar este metodo. @agus
+      if (config.scanOnSave) {
+        vscode.workspace.onDidChangeTextDocument(() => {
+          removeAllHighlights();
+        });
 
-      vscode.workspace.onDidSaveTextDocument((document) => {
-        if (
-          vscode.window.activeTextEditor &&
-          document === vscode.window.activeTextEditor.document
-        ) {
-          scanFileOnSaveCommand(document);
-        }
-      });
+        vscode.workspace.onDidSaveTextDocument((document) => {
+          if (
+            vscode.window.activeTextEditor &&
+            document === vscode.window.activeTextEditor.document
+          ) {
+            scanFileOnSaveCommand(document);
+          }
+        });
+      }
     }
 
     context.subscriptions.push(
