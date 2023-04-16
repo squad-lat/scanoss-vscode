@@ -7,9 +7,13 @@ import {
   showDoneButton,
   showProcessButton,
 } from '../ui/buttons.status-bar';
+import {
+  getDependencyTree,
+  getDependenciesFromNpmLs,
+} from '../utils/dependency-tree';
 import { checkIfSbomExists } from '../utils/sbom';
 import { collectFilePaths, getRootProjectFolder } from '../utils/sdk';
-import { SpdxLiteJson } from '../utils/spdx';
+import { generateSpdxLite } from '../utils/spdx';
 
 export const scanProjectCommand = vscode.commands.registerCommand(
   'extension.scanProject',
@@ -43,6 +47,18 @@ export const scanProjectCommand = vscode.commands.registerCommand(
             fs.mkdirSync(dirname, { recursive: true });
           }
 
+          let allDependencies = null;
+          try {
+            const dependencyTree = await getDependencyTree();
+            if (dependencyTree) {
+              allDependencies = await getDependenciesFromNpmLs(dependencyTree);
+            } else {
+              allDependencies = [];
+            }
+          } catch (error) {
+            console.error('dependencyTree error:', error);
+          }
+
           fs.writeFileSync(path.join(dirname, 'sbom.temp.json'), data, 'utf-8');
           showDoneButton();
 
@@ -54,10 +70,11 @@ export const scanProjectCommand = vscode.commands.registerCommand(
           if (optionSelected === 'Update') {
             showProcessButton();
 
-            const spdxLiteJson = new SpdxLiteJson(JSON.parse(data));
-            const spdxData = await spdxLiteJson.generate();
-
             try {
+              const spdxData = await generateSpdxLite(
+                JSON.parse(data),
+                allDependencies || []
+              );
               fs.writeFileSync(
                 path.join(rootFolder, 'sbom.json'),
                 spdxData,
@@ -70,6 +87,7 @@ export const scanProjectCommand = vscode.commands.registerCommand(
 
               showDoneButton();
             } catch (error) {
+              console.error('Error updating sbom.json file:', error);
               vscode.window.showErrorMessage(
                 'An error occurred while trying to update the sbom.json file'
               );
@@ -77,8 +95,6 @@ export const scanProjectCommand = vscode.commands.registerCommand(
           }
         });
       }
-
-      return Promise.reject();
     } catch (error) {
       showErrorButton();
       const optionSelected = await vscode.window.showErrorMessage(
