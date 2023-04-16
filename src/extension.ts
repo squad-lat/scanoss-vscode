@@ -22,21 +22,20 @@ export async function activate(context: vscode.ExtensionContext) {
         await checkSbomFile();
       }
 
-      // TODO: Revisar este metodo. @agus
-      if (config.scanOnSave) {
-        vscode.workspace.onDidChangeTextDocument(() => {
-          removeAllHighlights();
-        });
+      vscode.workspace.onDidChangeTextDocument(() => {
+        removeAllHighlights();
+      });
 
-        vscode.workspace.onDidSaveTextDocument((document) => {
+      vscode.workspace.onDidSaveTextDocument((document) => {
+        if (config.scanOnSave) {
           if (
             vscode.window.activeTextEditor &&
             document === vscode.window.activeTextEditor.document
           ) {
             scanFileOnSaveCommand(document);
           }
-        });
-      }
+        }
+      });
     }
 
     context.subscriptions.push(

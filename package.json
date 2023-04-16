@@ -70,7 +70,7 @@
   },
   "dependencies": {
     "cosmiconfig": "^8.1.3",
-    "scanoss": "^0.8.7",
+    "scanoss": "^0.8.8",
     "snyk-nodejs-lockfile-parser": "^1.48.3"
   }
 }
