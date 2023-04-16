@@ -2,11 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Scanner } from 'scanoss';
 import * as vscode from 'vscode';
-import {
-  showErrorButton,
-  showDoneButton,
-  showProcessButton,
-} from '../ui/buttons.status-bar';
+import { processingButton, doneButton } from '../ui/main-button.status-bar';
 import {
   getDependencyTree,
   getDependenciesFromNpmLs,
@@ -18,7 +14,10 @@ import { generateSpdxLite } from '../utils/spdx';
 export const scanProjectCommand = vscode.commands.registerCommand(
   'extension.scanProject',
   async () => {
-    showProcessButton();
+    processingButton(
+      'Scanning project',
+      'ScanOSS is scanning the entire project for matches'
+    );
 
     try {
       const scanner = new Scanner();
@@ -36,6 +35,7 @@ export const scanProjectCommand = vscode.commands.registerCommand(
       if (resultPath) {
         fs.readFile(resultPath, 'utf-8', async (err, data) => {
           if (err) {
+            doneButton();
             throw new Error(
               `An error occurred while trying to read the temporary file`
             );
@@ -60,7 +60,7 @@ export const scanProjectCommand = vscode.commands.registerCommand(
           }
 
           fs.writeFileSync(path.join(dirname, 'sbom.temp.json'), data, 'utf-8');
-          showDoneButton();
+          doneButton();
 
           const optionSelected = await vscode.window.showInformationMessage(
             'Do you want to update your local sbom.json file with the scan results?',
@@ -68,13 +68,17 @@ export const scanProjectCommand = vscode.commands.registerCommand(
           );
 
           if (optionSelected === 'Update') {
-            showProcessButton();
+            processingButton(
+              'Updating sbom.json file',
+              'ScanOSS is updating its sbom.json file with the analysis results'
+            );
 
             try {
               const spdxData = await generateSpdxLite(
                 JSON.parse(data),
                 allDependencies || []
               );
+
               fs.writeFileSync(
                 path.join(rootFolder, 'sbom.json'),
                 spdxData,
@@ -85,18 +89,20 @@ export const scanProjectCommand = vscode.commands.registerCommand(
                 'Updated sbom.json file successfully.'
               );
 
-              showDoneButton();
+              doneButton('File updated');
             } catch (error) {
-              console.error('Error updating sbom.json file:', error);
+              doneButton('ScanOSS', 'error');
               vscode.window.showErrorMessage(
                 'An error occurred while trying to update the sbom.json file'
               );
+            } finally {
+              doneButton();
             }
           }
         });
       }
     } catch (error) {
-      showErrorButton();
+      doneButton('ScanOSS', 'error');
       const optionSelected = await vscode.window.showErrorMessage(
         'An error occurred while performing the scan.',
         ...['Retry']
@@ -105,6 +111,8 @@ export const scanProjectCommand = vscode.commands.registerCommand(
       if (optionSelected === 'Retry') {
         vscode.commands.executeCommand('extension.scanProject');
       }
+    } finally {
+      doneButton();
     }
   }
 );

@@ -17,18 +17,14 @@ export const scanPastedContentCommand = vscode.commands.registerCommand(
     }
 
     try {
-      // Create a temporary file
       const tmpDir = os.tmpdir();
       const tmpFilename = `sossTmp${Date.now()}${fileExtension}`;
       const tmpFilepath = path.join(tmpDir, tmpFilename);
 
-      // Write the content to the temporary file
       fs.writeFileSync(tmpFilepath, content, 'utf8');
 
-      // Run the scanCurrentFile function with the temporary file path
       scanFiles([tmpFilepath], true);
 
-      // Delete the temporary file
       fs.unlinkSync(tmpFilepath);
     } catch (error) {
       vscode.window.showErrorMessage(
