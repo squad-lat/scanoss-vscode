@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Scanner } from 'scanoss';
 import * as vscode from 'vscode';
+import { highlightLines } from '../ui/highlight.editor';
 import { checkIfSbomExists } from './sbom';
 
 export const getRootProjectFolder = async () => {
@@ -17,7 +18,7 @@ export const getRootProjectFolder = async () => {
 export const scanFiles = async (
   filePathsArray: string[],
   highlightErrors = false
-): Promise<void> => {
+) => {
   try {
     const scanner = new Scanner();
     const sbomFile = await checkIfSbomExists();
@@ -31,7 +32,10 @@ export const scanFiles = async (
     ]);
 
     if (resultPath) {
-      fs.readFile(resultPath, 'utf-8', (err, data) => {
+      try {
+        const document = await vscode.workspace.openTextDocument(resultPath);
+        const data = document.getText();
+
         const dirname = `${rootFolder}/.scanoss`;
 
         if (!fs.existsSync(dirname)) {
@@ -39,55 +43,30 @@ export const scanFiles = async (
         }
 
         fs.writeFileSync(path.join(dirname, 'sbom.temp.json'), data, 'utf-8');
-      });
-    }
 
-    return Promise.resolve();
+        type ScanResult = {
+          [scannedFilePath: string]: any[];
+        };
 
-    // FIXME: Utilizar API async y await. @agus
-    /* return new Promise(async (resolve) => {
-      const sbomFile = await checkIfSbomExists();
-
-      scanner
-        .scan([{ fileList: filePathsArray, sbom: sbomFile.path }])
-        .then((resultPath) => {
-          fs.readFile(resultPath, 'utf-8', (err, data) => {
-            if (err) {
-              vscode.window.showErrorMessage(
-                'Error reading scan result: ' + err.message
-              );
-              return;
-            }
-
-            // vscode.window.showInformationMessage(`Scan completed: ${data}`);
-
-            type ScanResult = {
-              [scannedFilePath: string]: any[];
-            };
-
-            const scanResults = JSON.parse(data);
-
-            Object.entries(scanResults as ScanResult).forEach(
-              ([scannedFilePath, findings]: [string, any[]]) => {
-                findings.forEach((finding) => {
-                  if (highlightErrors) {
-                    highlightLines(scannedFilePath, finding.lines);
-                  }
-                });
+        if (highlightErrors) {
+          let foundErrors = false;
+          const scanResults = JSON.parse(data);
+          for (const [scannedFilePath, findings] of Object.entries(
+            scanResults as ScanResult
+          )) {
+            for (const finding of findings) {
+              if (finding.id !== 'none') {
+                foundErrors = true;
+                await highlightLines(scannedFilePath, finding.lines);
               }
-            );
-
-            fs.unlinkSync(resultPath);
-
-            resolve(scanResults);
-          });
-        })
-        .catch((error) => {
-          vscode.window.showErrorMessage(
-            'Error running scan: ' + error.message
-          );
-        });
-    }); */
+            }
+          }
+          return foundErrors;
+        }
+      } catch (error: any) {
+        console.error(`Error reading scan result: ${error.message}`);
+      }
+    }
   } catch (error) {
     throw new Error(`An error occurred while scanning the files.`);
   }
