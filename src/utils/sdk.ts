@@ -54,7 +54,9 @@ export const scanFiles = async (
             scanResults as ScanResult
           )) {
             for (const finding of findings) {
-              await highlightLines(scannedFilePath, finding.lines);
+              if (finding.id !== 'none') {
+                await highlightLines(scannedFilePath, finding.lines);
+              }
             }
           }
         }
