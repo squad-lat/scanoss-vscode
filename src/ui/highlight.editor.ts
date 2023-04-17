@@ -12,13 +12,11 @@ export const highlightLines = async (filePath: string, lines: string) => {
     );
 
     if (!editor) {
-      return;
+      throw new Error();
     }
 
-    // Split the input lines string into an array of line ranges
     const lineRanges = lines.split(',');
 
-    // Iterate over the lineRanges array and create a vscode.Range for each range
     const ranges = lineRanges.map((range) => {
       const [startLine, endLine] = range
         .split('-')
@@ -33,7 +31,6 @@ export const highlightLines = async (filePath: string, lines: string) => {
       );
     });
 
-    // Remove the current highlights for the file
     if (activeDecorations.has(filePath)) {
       const currentDecoration = activeDecorations.get(filePath);
       if (currentDecoration) {
@@ -42,7 +39,6 @@ export const highlightLines = async (filePath: string, lines: string) => {
       }
     }
 
-    // Set the new highlights
     const decorationType = vscode.window.createTextEditorDecorationType({
       backgroundColor: 'rgba(255, 255, 160, 0.1)',
       isWholeLine: true,
@@ -50,10 +46,11 @@ export const highlightLines = async (filePath: string, lines: string) => {
 
     editor.setDecorations(decorationType, ranges);
 
-    // Store the new decoration type in the map
     activeDecorations.set(filePath, decorationType);
   } catch (error: any) {
-    console.error(`Error highlighting lines in ${filePath}: ${error.message}`);
+    throw new Error(
+      `An error ocurred when trying to highlight lines. ${error}`
+    );
   }
 };
 
