@@ -5,7 +5,10 @@ import { scanFiles } from '../utils/sdk';
 export const scanFileOnSaveCommand = async (document: vscode.TextDocument) => {
   try {
     processingButton(`Scanning ${document.uri.fsPath.split('/').at(-1)}`);
-    scanFiles([document.uri.fsPath], true);
+    const scanHasMatches = await scanFiles([document.uri.fsPath], true);
+    if (scanHasMatches) {
+      doneButton('ScanOSS', 'error');
+    }
   } catch (error) {
     doneButton('ScanOSS', 'error');
     const option = await vscode.window.showErrorMessage(

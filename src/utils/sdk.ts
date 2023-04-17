@@ -18,7 +18,7 @@ export const getRootProjectFolder = async () => {
 export const scanFiles = async (
   filePathsArray: string[],
   highlightErrors = false
-): Promise<void> => {
+) => {
   try {
     const scanner = new Scanner();
     const sbomFile = await checkIfSbomExists();
@@ -49,23 +49,24 @@ export const scanFiles = async (
         };
 
         if (highlightErrors) {
+          let foundErrors = false;
           const scanResults = JSON.parse(data);
           for (const [scannedFilePath, findings] of Object.entries(
             scanResults as ScanResult
           )) {
             for (const finding of findings) {
               if (finding.id !== 'none') {
+                foundErrors = true;
                 await highlightLines(scannedFilePath, finding.lines);
               }
             }
           }
+          return foundErrors;
         }
       } catch (error: any) {
         console.error(`Error reading scan result: ${error.message}`);
       }
     }
-
-    return Promise.resolve();
   } catch (error) {
     throw new Error(`An error occurred while scanning the files.`);
   }
