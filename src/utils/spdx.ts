@@ -31,13 +31,21 @@ export const generateSpdxLite = async (source: any, allDependencies: any[]) => {
         purl: `pkg:npm/${component}@${version}`,
       })
     );
+
     dependencies.push(...allDependencies);
+
+    // Use a Set to store unique dependency components
+    const uniqueDependencyComponents = new Set();
 
     // Merge dependencies with the existing source object
     const mergedSource = { ...source, dependencies };
     Object.entries(mergedSource).forEach(([, dataArray]: [any, unknown]) => {
       (dataArray as any[]).forEach((data: any) => {
-        if (data.id !== 'none') {
+        if (
+          data.component !== 'none' &&
+          !uniqueDependencyComponents.has(data.component)
+        ) {
+          uniqueDependencyComponents.add(data.component);
           const pkg = getPackage(data);
           spdx.packages.push(pkg);
           spdx.documentDescribes.push(pkg.SPDXID);
