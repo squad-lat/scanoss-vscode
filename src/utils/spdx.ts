@@ -7,9 +7,14 @@ export const generateSpdxLite = async (source: any) => {
     spdx.packages = [];
     spdx.documentDescribes = [];
 
+    const uniqueComponents = new Set();
     Object.entries(source).forEach(([, dataArray]: [any, unknown]) => {
       (dataArray as any[]).forEach((data: any) => {
-        if (data.component !== 'none') {
+        if (data.id !== 'none') {
+          if (uniqueComponents.has(data.component)) {
+            return;
+          }
+          uniqueComponents.add(data.component);
           const pkg = getPackage(data);
           spdx.packages.push(pkg);
           spdx.documentDescribes.push(pkg.SPDXID);
@@ -25,14 +30,15 @@ export const generateSpdxLite = async (source: any) => {
     spdx.SPDXID = spdx.SPDXID.replace('###', hex);
     spdx.documentNamespace = spdx.documentNamespace.replace('UUID', hex);
 
-    return JSON.stringify(spdx, undefined, 4);
+    return spdx;
   } catch (error: any) {
     console.error(`Error generating SPDX Lite: ${error.message}`);
     throw error;
   }
 };
 
-const getPackage = (data: any) => {
+export const getPackage = (data: any) => {
+  // console.log(data.component, data);
   const pkg: any = {};
   pkg.name = data.component;
   pkg.SPDXID = `SPDXRef-${crypto
@@ -43,8 +49,12 @@ const getPackage = (data: any) => {
   pkg.downloadLocation = data.url ? data.url : 'NOASSERTION';
   pkg.filesAnalyzed = false;
   pkg.homepage = data.url || 'NOASSERTION';
-  pkg.licenseDeclared = data.licenses ? data.licenses : 'NOASSERTION';
-  pkg.licenseConcluded = data.licenses ? data.licenses : 'NOASSERTION';
+  pkg.licenseDeclared = data.licensesList?.[0]
+    ? data.licensesList[0].name
+    : 'NOASSERTION';
+  pkg.licenseConcluded = data.licensesList?.[1]
+    ? data.licensesList[1].name
+    : 'NOASSERTION';
   pkg.copyrightText = 'NOASSERTION';
   pkg.externalRefs = [
     {
