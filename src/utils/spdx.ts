@@ -38,7 +38,6 @@ export const generateSpdxLite = async (source: any) => {
 };
 
 export const getPackage = (data: any) => {
-  // console.log(data.component, data);
   const pkg: any = {};
   pkg.name = data.component;
   pkg.SPDXID = `SPDXRef-${crypto
@@ -51,6 +50,8 @@ export const getPackage = (data: any) => {
   pkg.homepage = data.url || 'NOASSERTION';
   pkg.licenseDeclared = data.licensesList?.[0]
     ? data.licensesList[0].name
+    : data.licenses?.[0]
+    ? data.licenses[0].name
     : 'NOASSERTION';
   pkg.licenseConcluded = data.licensesList?.[1]
     ? data.licensesList[1].name
