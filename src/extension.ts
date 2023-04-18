@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import { createConfigFile } from './commands/create-config-file.command';
 import { scanCurrentFileCommand } from './commands/scan-current-file.command';
 import { scanFileOnSaveCommand } from './commands/scan-file-on-save.command';
-import { scanPastedContentCommand } from './commands/scan-pasted-content.command';
 import { scanProjectCommand } from './commands/scan-project.command';
 import { removeAllHighlights } from './ui/highlight.editor';
 
@@ -41,7 +40,6 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
       createConfigFile,
       scanCurrentFileCommand,
-      scanPastedContentCommand,
       scanProjectCommand
     );
   }

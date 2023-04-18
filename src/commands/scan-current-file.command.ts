@@ -18,7 +18,7 @@ export const scanCurrentFileCommand = vscode.commands.registerCommand(
 
       processingButton(
         `Scanning ${fileName}`,
-        `ScanOSS is scanning ${fileName}`
+        `SCANOSS is scanning ${fileName}`
       );
 
       const filePath = editor.document.uri.fsPath;
@@ -26,7 +26,7 @@ export const scanCurrentFileCommand = vscode.commands.registerCommand(
 
       doneButton();
     } catch (error) {
-      doneButton('ScanOSS', 'error');
+      doneButton('SCANOSS', 'error');
       const option = await vscode.window.showErrorMessage(
         'An error occurred while trying to scan the current file.',
         ...['Retry']

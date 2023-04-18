@@ -6,14 +6,14 @@ export const mainButton = vscode.window.createStatusBarItem(
 );
 
 export const initializedButton = () => {
-  mainButton.text = '$(file-binary) ScanOSS';
-  mainButton.tooltip = 'ScanOSS initialized';
+  mainButton.text = '$(file-binary) SCANOSS';
+  mainButton.tooltip = 'SCANOSS initialized';
   mainButton.show();
 };
 
 export const processingButton = (text: string, tooltipText?: string) => {
   mainButton.text = `$(sync~spin) ${text}`;
-  mainButton.tooltip = tooltipText ?? 'ScanOSS is processing';
+  mainButton.tooltip = tooltipText ?? 'SCANOSS is processing';
   mainButton.show();
 };
 
@@ -45,8 +45,8 @@ export const doneButton = (doneText?: string, state?: 'error' | 'done') => {
 };
 
 export const showErrorButton = () => {
-  mainButton.text = '$(error) ScanOSS';
-  mainButton.tooltip = 'ScanOSS is running, click to show logs.';
+  mainButton.text = '$(error) SCANOSS';
+  mainButton.tooltip = 'SCANOSS is running, click to show logs.';
   mainButton.command = 'extension.scanFileSdk';
   mainButton.backgroundColor = new vscode.ThemeColor(
     'statusBarItem.errorBackground'
@@ -56,14 +56,14 @@ export const showErrorButton = () => {
 
 export const showProcessButton = () => {
   mainButton.text = '$(sync~spin) Scanning';
-  mainButton.tooltip = 'ScanOSS is running the scan.';
+  mainButton.tooltip = 'SCANOSS is running the scan.';
   mainButton.command = 'extension.scanFileSdk';
   mainButton.show();
 };
 
 export const showDoneButton = () => {
   mainButton.hide();
-  mainButton.text = 'ScanOSS';
+  mainButton.text = 'SCANOSS';
   mainButton.command = 'extension.scanFileSdk';
   mainButton.show();
 };

@@ -7,10 +7,10 @@ export const scanFileOnSaveCommand = async (document: vscode.TextDocument) => {
     processingButton(`Scanning ${document.uri.fsPath.split('/').at(-1)}`);
     const scanHasMatches = await scanFiles([document.uri.fsPath], true);
     if (scanHasMatches) {
-      doneButton('ScanOSS', 'error');
+      doneButton('SCANOSS', 'error');
     }
   } catch (error) {
-    doneButton('ScanOSS', 'error');
+    doneButton('SCANOSS', 'error');
     const option = await vscode.window.showErrorMessage(
       'An error occurred while trying to scan the current file.',
       ...['Retry']

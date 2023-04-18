@@ -72,27 +72,6 @@ export const scanFiles = async (
   }
 };
 
-let prevText = '';
-
-export const scanPastedContent = async (
-  event: vscode.TextDocumentChangeEvent
-) => {
-  if (prevText !== event.document.getText()) {
-    const clipboardContent = event.document.getText();
-
-    const fileExtension = path.extname(event.document.fileName);
-
-    if (clipboardContent.trim() !== '') {
-      vscode.commands.executeCommand(
-        'extension.scanPastedContent',
-        clipboardContent,
-        fileExtension
-      );
-    }
-  }
-  prevText = event.document.getText();
-};
-
 export const collectFilePaths = async (
   directoryPath: string,
   filePaths: string[] = []

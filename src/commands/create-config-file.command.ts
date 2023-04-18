@@ -24,7 +24,7 @@ export const createConfigFile = vscode.commands.registerCommand(
 
       doneButton('File created');
     } catch (error) {
-      doneButton('ScanOSS', 'error');
+      doneButton('SCANOSS', 'error');
       const option = await vscode.window.showErrorMessage(
         'An error occurred while trying to create the .scanossrc file.',
         ...['Retry']

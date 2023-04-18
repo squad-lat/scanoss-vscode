@@ -18,7 +18,7 @@ export const defaultConfig: ScanOSSConfig = {
 };
 
 export async function checkRcConfigurationFile(): Promise<CheckRcConfigurationFile> {
-  processingButton('ScanOSS is initializing', 'ScanOSS is initializing');
+  processingButton('SCANOSS is initializing', 'SCANOSS is initializing');
   const rootFolder = await getRootProjectFolder();
   const explorer = cosmiconfig('scanoss');
   const results = await explorer.search(rootFolder);

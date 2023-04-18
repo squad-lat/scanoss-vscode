@@ -17,12 +17,12 @@
     "commands": [
       {
         "command": "extension.scanCurrentFile",
-        "title": "ScanOSS: Scan Current File",
+        "title": "SCANOSS: Scan Current File",
         "enablement": "resource"
       },
       {
         "command": "extension.scanProject",
-        "title": "ScanOSS: Scan Project"
+        "title": "SCANOSS: Scan Project"
       }
     ]
   },
