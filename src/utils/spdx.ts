@@ -48,11 +48,7 @@ export const getPackage = (data: any) => {
   pkg.downloadLocation = data.url ? data.url : 'NOASSERTION';
   pkg.filesAnalyzed = false;
   pkg.homepage = data.url || 'NOASSERTION';
-  pkg.licenseDeclared = data.licensesList?.[0]
-    ? data.licensesList[0].name
-    : data.licenses?.[0]
-    ? data.licenses[0].name
-    : 'NOASSERTION';
+  pkg.licenseDeclared = getLicenseName(data);
   pkg.licenseConcluded = data.licensesList?.[1]
     ? data.licensesList[1].name
     : 'NOASSERTION';
@@ -64,6 +60,16 @@ export const getPackage = (data: any) => {
       referenceType: 'purl',
     },
   ];
-
+  console.log(pkg.name, pkg.licenseDeclared);
   return pkg;
+};
+
+const getLicenseName = (data: any) => {
+  if (data.licensesList?.length) {
+    return data.licensesList.map((license: any) => license.name).join(' AND ');
+  } else if (data.licenses?.length) {
+    return data.licenses.join(' AND ');
+  } else {
+    return 'NOASSERTION';
+  }
 };
