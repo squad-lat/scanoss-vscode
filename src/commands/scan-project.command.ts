@@ -3,13 +3,10 @@ import * as path from 'path';
 import { Scanner } from 'scanoss';
 import * as vscode from 'vscode';
 import { processingButton, doneButton } from '../ui/main-button.status-bar';
-import {
-  getDependencyTree,
-  getDependenciesFromNpmLs,
-} from '../utils/dependency-tree';
+import { scanDependencies } from '../utils/dependencyScanner';
 import { checkIfSbomExists } from '../utils/sbom';
 import { collectFilePaths, getRootProjectFolder } from '../utils/sdk';
-import { generateSpdxLite } from '../utils/spdx';
+import { generateSpdxLite, getPackage } from '../utils/spdx';
 
 export const scanProjectCommand = vscode.commands.registerCommand(
   'extension.scanProject',
@@ -24,6 +21,17 @@ export const scanProjectCommand = vscode.commands.registerCommand(
       const sbomFile = await checkIfSbomExists();
       const rootFolder = await getRootProjectFolder();
       const filePaths = await collectFilePaths(rootFolder);
+      const scanDependenciesResult = await scanDependencies(filePaths);
+
+      let depPackages: string[] = [];
+      scanDependenciesResult.filesList.map((file) => {
+        file.dependenciesList.map((dependency) => {
+          const depPackage = getPackage(dependency);
+          if (depPackage) {
+            depPackages.push(depPackage);
+          }
+        });
+      });
 
       const resultPath = await scanner.scan([
         {
@@ -47,18 +55,6 @@ export const scanProjectCommand = vscode.commands.registerCommand(
             fs.mkdirSync(dirname, { recursive: true });
           }
 
-          let allDependencies = null;
-          try {
-            const dependencyTree = await getDependencyTree();
-            if (dependencyTree) {
-              allDependencies = await getDependenciesFromNpmLs(dependencyTree);
-            } else {
-              allDependencies = [];
-            }
-          } catch (error) {
-            console.error('dependencyTree error:', error);
-          }
-
           fs.writeFileSync(path.join(dirname, 'sbom.temp.json'), data, 'utf-8');
           doneButton();
 
@@ -74,14 +70,13 @@ export const scanProjectCommand = vscode.commands.registerCommand(
             );
 
             try {
-              const spdxData = await generateSpdxLite(
-                JSON.parse(data),
-                allDependencies || []
-              );
+              const spdxData = await generateSpdxLite(JSON.parse(data));
+              spdxData.packages = spdxData.packages.concat(depPackages);
 
+              const spdxDataJSON = JSON.stringify(spdxData, undefined, 4);
               fs.writeFileSync(
                 path.join(rootFolder, 'sbom.json'),
-                spdxData,
+                spdxDataJSON,
                 'utf-8'
               );
 

@@ -82,7 +82,7 @@ export const collectFilePaths = async (
     for (const entry of entries) {
       const entryPath = path.join(directoryPath, entry.name);
 
-      if (entry.isDirectory()) {
+      if (entry.isDirectory() && entry.name !== 'node_modules') {
         await collectFilePaths(entryPath, filePaths);
       } else if (entry.isFile()) {
         filePaths.push(entryPath);

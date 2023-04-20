@@ -56,7 +56,7 @@ export const generateSbomTemplate = () => {
     dataLicense: 'CC0-1.0',
     SPDXID: 'SPDXRef-###',
     name: 'SCANOSS-SBOM',
-    documentNamespace: 'https://spdx.dev/spdx-specification-20-web-version/',
+    documentNamespace: 'https://spdx.org/spdxdocs/UUID',
     creationInfo: {
       creators: [
         'Tool: SCANOSS Vscode Extension',
