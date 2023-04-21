@@ -24,11 +24,13 @@ export const scanProjectCommand = vscode.commands.registerCommand(
       const scanDependenciesResult = await scanDependencies(filePaths);
 
       let depPackages: string[] = [];
+      let depDocumentDescribes: string[] = [];
       scanDependenciesResult.filesList.map((file) => {
         file.dependenciesList.map((dependency) => {
           const depPackage = getPackage(dependency);
           if (depPackage) {
             depPackages.push(depPackage);
+            depDocumentDescribes.push(depPackage.SPDXID);
           }
         });
       });
@@ -72,7 +74,8 @@ export const scanProjectCommand = vscode.commands.registerCommand(
             try {
               const spdxData = await generateSpdxLite(JSON.parse(data));
               spdxData.packages = spdxData.packages.concat(depPackages);
-
+              spdxData.documentDescribes =
+                spdxData.documentDescribes.concat(depDocumentDescribes);
               const spdxDataJSON = JSON.stringify(spdxData, undefined, 4);
               fs.writeFileSync(
                 path.join(rootFolder, 'sbom.json'),
