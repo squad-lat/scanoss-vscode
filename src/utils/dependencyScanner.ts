@@ -14,7 +14,7 @@ export const scanDependencies = async (allFiles: string[]) => {
       f.file = f.file.replace(rootPath, '');
     });
     await fs.promises.writeFile(
-      `${rootFolder}/dependencies.json`,
+      `${rootFolder}/.scanoss/dependencies.json`,
       JSON.stringify(dependencies, null, 2)
     );
     return dependencies;

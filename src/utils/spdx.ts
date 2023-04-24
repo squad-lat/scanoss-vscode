@@ -60,7 +60,6 @@ export const getPackage = (data: any) => {
       referenceType: 'purl',
     },
   ];
-  console.log(pkg.name, pkg.licenseDeclared);
   return pkg;
 };
 
