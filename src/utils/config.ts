@@ -71,6 +71,11 @@ export async function checkSbomFile() {
 
     if (optionSelected === 'Create') {
       createSbomFile();
+      try {
+        checkSbomFile();
+      } catch (error: any) {
+        throw new Error(error);
+      }
     } else {
       const filesSelected = await vscode.window.showOpenDialog({
         canSelectFiles: true,
