@@ -8,17 +8,26 @@ export const scanDependencies = async (allFiles: string[]) => {
     const rootPath = rootFolder + '/';
 
     const dependencyScanner = new DependencyScanner();
-
     const dependencies = await dependencyScanner.scan(allFiles);
+
     dependencies.filesList.forEach((f) => {
       f.file = f.file.replace(rootPath, '');
     });
+
+    const dirname = `${rootFolder}/.scanoss`;
+
+    if (!fs.existsSync(dirname)) {
+      fs.mkdirSync(dirname, { recursive: true });
+    }
+
     await fs.promises.writeFile(
-      `${rootFolder}/.scanoss/dependencies.json`,
+      `${dirname}/dependencies.json`,
       JSON.stringify(dependencies, null, 2)
     );
+
     return dependencies;
   } catch (error) {
+    console.log('ACA', error);
     throw new Error(`An error occurred while scanning the files., ${error}`);
   }
 };

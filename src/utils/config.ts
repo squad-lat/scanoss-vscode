@@ -34,6 +34,13 @@ export async function checkRcConfigurationFile(): Promise<CheckRcConfigurationFi
       vscode.commands.executeCommand('extension.createConfigFile');
     }
   }
+
+  try {
+    checkSbomFile();
+  } catch (error: any) {
+    throw new Error(error);
+  }
+
   doneButton();
 
   return {
