@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 const activeDecorations = new Map<string, vscode.TextEditorDecorationType>();
 
 export const highlightLines = async (filePath: string, lines: string) => {
+  removeAllHighlights();
   try {
     const normalizedFilePath = path.normalize(filePath);
     const editor = vscode.window.visibleTextEditors.find(
@@ -55,17 +56,8 @@ export const highlightLines = async (filePath: string, lines: string) => {
 };
 
 export const removeAllHighlights = () => {
-  if (activeDecorations.size > 0) {
-    for (const [filePath, decorationType] of activeDecorations.entries()) {
-      const editor = vscode.window.visibleTextEditors.find(
-        (editor) => editor.document.uri.fsPath === filePath
-      );
-
-      if (editor) {
-        editor.setDecorations(decorationType, []);
-        decorationType.dispose();
-      }
-    }
-    activeDecorations.clear();
-  }
+  activeDecorations.forEach((decoration) => {
+    decoration.dispose();
+  });
+  activeDecorations.clear();
 };
