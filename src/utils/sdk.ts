@@ -61,7 +61,7 @@ export const scanFiles = async (
               }
             }
           }
-          return foundErrors;
+          return { foundErrors, scanResults };
         }
       } catch (error: any) {
         console.error(`Error reading scan result: ${error.message}`);
