@@ -16,13 +16,27 @@ export const scanCurrentFileCommand = vscode.commands.registerCommand(
         .split('/')
         .at(-1);
 
+      if (fileName?.includes('extension-output')) {
+        vscode.window.showInformationMessage(
+          'Please focus on the editor, not the terminal, before running the command.'
+        );
+        return;
+      }
+
       processingButton(
         `Scanning ${fileName}`,
         `SCANOSS is scanning ${fileName}`
       );
 
       const filePath = editor.document.uri.fsPath;
-      await scanFiles([filePath], true);
+      const scanResult = await scanFiles([filePath], true);
+
+      if (!scanResult) {
+        const outputChannel =
+          vscode.window.createOutputChannel('Scanoss Output');
+        outputChannel.show();
+        outputChannel.appendLine('No match found.');
+      }
 
       doneButton();
     } catch (error) {
