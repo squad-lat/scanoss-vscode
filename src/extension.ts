@@ -35,6 +35,20 @@ export async function activate(context: vscode.ExtensionContext) {
           }
         }
       });
+    } else {
+      // use default config
+      vscode.workspace.onDidChangeTextDocument(() => {
+        removeAllHighlights();
+      });
+
+      vscode.workspace.onDidSaveTextDocument((document) => {
+        if (
+          vscode.window.activeTextEditor &&
+          document === vscode.window.activeTextEditor.document
+        ) {
+          scanFileOnSaveCommand(document);
+        }
+      });
     }
 
     context.subscriptions.push(
