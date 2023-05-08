@@ -29,13 +29,24 @@ export const scanCurrentFileCommand = vscode.commands.registerCommand(
       );
 
       const filePath = editor.document.uri.fsPath;
-      const scanResult = await scanFiles([filePath], true);
+      const { foundErrors, scanResults } = (await scanFiles(
+        [filePath],
+        true
+      )) as {
+        foundErrors: boolean;
+        scanResults: string;
+      };
 
-      if (!scanResult) {
+      if (!foundErrors) {
         const outputChannel =
           vscode.window.createOutputChannel('Scanoss Output');
         outputChannel.show();
         outputChannel.appendLine('No match found.');
+      } else {
+        const outputChannel =
+          vscode.window.createOutputChannel('Scanoss Output');
+        outputChannel.show();
+        outputChannel.appendLine(JSON.stringify(scanResults, null, 2));
       }
 
       doneButton();
