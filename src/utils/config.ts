@@ -1,6 +1,7 @@
 import { cosmiconfig } from 'cosmiconfig';
 import * as vscode from 'vscode';
 import { doneButton, processingButton } from '../ui/main-button.status-bar';
+import { showLog } from './logs';
 import { checkIfSbomExists, createSbomFile, importSbomFile } from './sbom';
 import { getRootProjectFolder } from './sdk';
 import type { ScanOSSConfig } from '../types';
@@ -13,8 +14,6 @@ type CheckRcConfigurationFile = {
 export const defaultConfig: ScanOSSConfig = {
   watch: false,
   scanOnSave: true,
-  replaceSbom: true,
-  saveTemps: true,
 };
 
 export async function checkRcConfigurationFile(): Promise<CheckRcConfigurationFile> {
@@ -36,8 +35,10 @@ export async function checkRcConfigurationFile(): Promise<CheckRcConfigurationFi
   }
 
   try {
-    checkSbomFile();
+    await checkSbomFile();
   } catch (error: any) {
+    showLog(`An error ocurred: ${error}`);
+
     throw new Error(error);
   }
 
@@ -52,30 +53,7 @@ export async function checkRcConfigurationFile(): Promise<CheckRcConfigurationFi
   };
 }
 
-export async function checkSbomFile() {
-  try {
-    await checkIfSbomExists();
-    const optionSelected = await vscode.window.showInformationMessage(
-      'We have detected an sbom.json file in your project. We can perform a scan of the project to search for matches.',
-      ...['Scan']
-    );
-
-    if (optionSelected === 'Scan') {
-      vscode.commands.executeCommand('extension.scanProject');
-    }
-  } catch (error) {
-    while (true) {
-      try {
-        await checkIfSbomExists();
-        break;
-      } catch (error) {
-        await selectOrImportSbomFile();
-      }
-    }
-  }
-}
-
-const selectOrImportSbomFile = async () => {
+export const selectOrImportSbomFile = async () => {
   const optionSelected = await vscode.window.showWarningMessage(
     'We have not detected an sbom.json file in your project. We can create it for you, or you can import one.',
     ...['Create', 'Import']
@@ -83,11 +61,6 @@ const selectOrImportSbomFile = async () => {
 
   if (optionSelected === 'Create') {
     createSbomFile();
-    try {
-      checkSbomFile();
-    } catch (error: any) {
-      throw new Error(error);
-    }
   } else if (optionSelected === 'Import') {
     const filesSelected = await vscode.window.showOpenDialog({
       canSelectFiles: true,
@@ -105,3 +78,24 @@ const selectOrImportSbomFile = async () => {
     }
   }
 };
+
+export async function checkSbomFile() {
+  try {
+    const result = await checkIfSbomExists();
+
+    if (result) {
+      const optionSelected = await vscode.window.showInformationMessage(
+        'We have detected an sbom.json file in your project. We can perform a scan of the project to search for matches.',
+        ...['Scan']
+      );
+
+      if (optionSelected === 'Scan') {
+        vscode.commands.executeCommand('extension.scanProject');
+      }
+    } else {
+      selectOrImportSbomFile();
+    }
+  } catch (error) {
+    showLog(`An error ocurred: ${error}`);
+  }
+}

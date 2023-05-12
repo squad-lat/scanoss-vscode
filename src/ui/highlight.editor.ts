@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { showLog } from '../utils/logs';
 
 const activeDecorations = new Map<string, vscode.TextEditorDecorationType>();
 
@@ -49,6 +50,8 @@ export const highlightLines = async (filePath: string, lines: string) => {
 
     activeDecorations.set(filePath, decorationType);
   } catch (error: any) {
+    showLog(`An error ocurred: ${error}`);
+
     throw new Error(
       `An error ocurred when trying to highlight lines. ${error}`
     );

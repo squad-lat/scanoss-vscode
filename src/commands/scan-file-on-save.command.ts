@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { doneButton, processingButton } from '../ui/main-button.status-bar';
+import { showLog } from '../utils/logs';
 import { scanFiles } from '../utils/sdk';
 
 export const scanFileOnSaveCommand = async (document: vscode.TextDocument) => {
@@ -13,18 +14,16 @@ export const scanFileOnSaveCommand = async (document: vscode.TextDocument) => {
       scanResults: string;
     };
 
-    console.log(foundErrors);
     if (!foundErrors) {
-      const outputChannel = vscode.window.createOutputChannel('Scanoss Output');
-      outputChannel.show();
-      outputChannel.appendLine('No match found.');
+      showLog('No match found.');
     } else {
-      doneButton('SCANOSS', 'error');
-      const outputChannel = vscode.window.createOutputChannel('Scanoss Output');
-      outputChannel.show();
-      outputChannel.appendLine(JSON.stringify(scanResults, null, 2));
+      showLog(JSON.stringify(scanResults, null, 2));
     }
+
+    doneButton('SCANOSS', 'error');
   } catch (error) {
+    showLog(`An error ocurred: ${error}`);
+
     doneButton('SCANOSS', 'error');
     const option = await vscode.window.showErrorMessage(
       'An error occurred while trying to scan the current file.',

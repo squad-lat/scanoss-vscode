@@ -4,6 +4,7 @@ import { Scanner } from 'scanoss';
 import * as vscode from 'vscode';
 import { processingButton, doneButton } from '../ui/main-button.status-bar';
 import { scanDependencies } from '../utils/dependencyScanner';
+import { showLog } from '../utils/logs';
 import { checkIfSbomExists } from '../utils/sbom';
 import { collectFilePaths, getRootProjectFolder } from '../utils/sdk';
 import { generateSpdxLite, getPackage } from '../utils/spdx';
@@ -36,10 +37,14 @@ export const scanProjectCommand = vscode.commands.registerCommand(
       });
 
       const resultPath = await scanner.scan([
-        {
-          fileList: filePaths,
-          sbom: sbomFile.path,
-        },
+        sbomFile
+          ? {
+              fileList: filePaths,
+              sbom: sbomFile.path,
+            }
+          : {
+              fileList: filePaths,
+            },
       ]);
 
       if (resultPath) {
@@ -60,12 +65,19 @@ export const scanProjectCommand = vscode.commands.registerCommand(
           fs.writeFileSync(path.join(dirname, 'sbom.temp.json'), data, 'utf-8');
           doneButton();
 
+          const result = await checkIfSbomExists();
+
           const optionSelected = await vscode.window.showInformationMessage(
-            'Do you want to update your local sbom.json file with the scan results?',
-            ...['Update']
+            result
+              ? 'Do you want to update your local sbom.json file with the scan results?'
+              : 'We have not detected a sbom.json file. Do you want to create it and add the scan results?',
+            ...[result ? 'Update' : 'Create and Update']
           );
 
-          if (optionSelected === 'Update') {
+          if (
+            optionSelected === 'Update' ||
+            optionSelected === 'Create and Update'
+          ) {
             processingButton(
               'Updating sbom.json file',
               'ScanOSS is updating its sbom.json file with the analysis results'
@@ -89,6 +101,8 @@ export const scanProjectCommand = vscode.commands.registerCommand(
 
               doneButton('File updated');
             } catch (error) {
+              showLog(`An error ocurred: ${error}`);
+
               doneButton('ScanOSS', 'error');
               vscode.window.showErrorMessage(
                 'An error occurred while trying to update the sbom.json file'
@@ -100,6 +114,8 @@ export const scanProjectCommand = vscode.commands.registerCommand(
         });
       }
     } catch (error) {
+      showLog(`An error ocurred: ${error}`);
+
       doneButton('ScanOSS', 'error');
       const optionSelected = await vscode.window.showErrorMessage(
         'An error occurred while performing the scan.',

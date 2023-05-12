@@ -1,4 +1,5 @@
 import * as crypto from 'crypto';
+import { showLog } from './logs';
 import { generateSbomTemplate } from './sbom';
 
 export const generateSpdxLite = async (source: any) => {
@@ -32,6 +33,7 @@ export const generateSpdxLite = async (source: any) => {
 
     return spdx;
   } catch (error: any) {
+    showLog(`An error ocurred: ${error}`);
     console.error(`Error generating SPDX Lite: ${error.message}`);
     throw error;
   }

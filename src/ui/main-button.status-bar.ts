@@ -46,7 +46,7 @@ export const doneButton = (doneText?: string, state?: 'error' | 'done') => {
 
 export const showErrorButton = () => {
   mainButton.text = '$(error) SCANOSS';
-  mainButton.tooltip = 'SCANOSS is running, click to show logs.';
+  mainButton.tooltip = 'SCANOSS is running';
   mainButton.command = 'extension.scanFileSdk';
   mainButton.backgroundColor = new vscode.ThemeColor(
     'statusBarItem.errorBackground'

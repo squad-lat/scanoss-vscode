@@ -3,6 +3,7 @@ import * as path from 'path';
 import { Scanner } from 'scanoss';
 import * as vscode from 'vscode';
 import { highlightLines } from '../ui/highlight.editor';
+import { showLog } from './logs';
 import { checkIfSbomExists } from './sbom';
 
 export const getRootProjectFolder = async () => {
@@ -25,10 +26,14 @@ export const scanFiles = async (
     const rootFolder = await getRootProjectFolder();
 
     const resultPath = await scanner.scan([
-      {
-        fileList: filePathsArray,
-        sbom: sbomFile.path,
-      },
+      sbomFile
+        ? {
+            fileList: filePathsArray,
+            sbom: sbomFile.path,
+          }
+        : {
+            fileList: filePathsArray,
+          },
     ]);
 
     if (resultPath) {
@@ -64,10 +69,14 @@ export const scanFiles = async (
           return { foundErrors, scanResults };
         }
       } catch (error: any) {
+        showLog(`An error ocurred: ${error}`);
+
         console.error(`Error reading scan result: ${error.message}`);
       }
     }
   } catch (error) {
+    showLog(`An error ocurred: ${error}`);
+
     throw new Error(`An error occurred while scanning the files.`);
   }
 };
@@ -91,6 +100,8 @@ export const collectFilePaths = async (
 
     return filePaths;
   } catch (error) {
+    showLog(`An error ocurred: ${error}`);
+
     throw new Error(`An error occurred while collecting the file paths`);
   }
 };
