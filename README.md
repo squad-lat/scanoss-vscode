@@ -6,7 +6,7 @@ The SCANOSS plugin for Visual Studio Code (VSCode) is an indispensable tool desi
 
 With the increasing adoption of AI-generated code and the risk of plagiarism, it is crucial to validate the origin and compliance of such code. The SCANOSS plugin utilizes the extensive SCANOSS knowledgebase to assess potential security vulnerabilities, licensing issues, and compliance risks directly within the VSCode environment. This empowers developers to effectively manage open source components, ensuring the security, reliability, and compliance of their software throughout the development process.
 
-# Usage
+### Usage
 
 You can use the following commands from the VScode command palette:
 
@@ -15,7 +15,7 @@ You can use the following commands from the VScode command palette:
 | SCANOSS: Scan Project      | Performs a complete scan of the file and proposes options. |
 | SCANOSS: Scan Current File | Scans the currently open file.                             |
 
-# Configuration
+### Configuration
 
 You can create a configuration file `.scanossrc` with the following options:
 
