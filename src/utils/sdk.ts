@@ -53,9 +53,10 @@ export const scanFiles = async (
           [scannedFilePath: string]: any[];
         };
 
+        const scanResults = JSON.parse(data);
+
         if (highlightErrors) {
           let foundErrors = false;
-          const scanResults = JSON.parse(data);
           for (const [scannedFilePath, findings] of Object.entries(
             scanResults as ScanResult
           )) {
@@ -67,6 +68,8 @@ export const scanFiles = async (
             }
           }
           return { foundErrors, scanResults };
+        } else {
+          return { foundErrors: false, scanResults };
         }
       } catch (error: any) {
         showLog(`An error ocurred: ${error}`);
