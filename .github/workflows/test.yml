@@ -1,4 +1,4 @@
-name: Coresite Build & Test
+name: VSCode SCANOSS run tests
 
 on:
   push:
@@ -26,5 +26,3 @@ jobs:
         run: npm ci
       - name: Test
         run: npm test
-      - name: Build
-        run: npm run build

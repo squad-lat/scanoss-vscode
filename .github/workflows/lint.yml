@@ -1,4 +1,4 @@
-name: Coresite Lints
+name: VSCode SCANOSS run linter
 
 on:
   push:
