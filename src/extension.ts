@@ -17,9 +17,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const { config } = await checkRcConfigurationFile();
 
     if (config) {
-      if (config.watch) {
-        await checkSbomFile();
-      }
+      await checkSbomFile();
 
       vscode.workspace.onDidChangeTextDocument(() => {
         removeAllHighlights();

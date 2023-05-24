@@ -12,7 +12,6 @@ type CheckRcConfigurationFile = {
 };
 
 export const defaultConfig: ScanOSSConfig = {
-  watch: false,
   scanOnSave: true,
 };
 
@@ -32,14 +31,6 @@ export async function checkRcConfigurationFile(): Promise<CheckRcConfigurationFi
     if (option === 'Create') {
       vscode.commands.executeCommand('extension.createConfigFile');
     }
-  }
-
-  try {
-    await checkSbomFile();
-  } catch (error: any) {
-    showLog(`An error ocurred: ${error}`);
-
-    throw new Error(error);
   }
 
   doneButton();
