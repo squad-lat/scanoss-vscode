@@ -30,18 +30,18 @@ export const scanCurrentFileCommand = vscode.commands.registerCommand(
       );
 
       const filePath = editor.document.uri.fsPath;
-      const { foundErrors, scanResults } = (await scanFiles(
-        [filePath],
-        true
-      )) as {
-        foundErrors: boolean;
-        scanResults: string;
-      };
-
+      const { foundErrors, scanResults } =
+        (await scanFiles([filePath], true)) || {};
       if (!foundErrors) {
-        showLog('Match not found.');
+        showLog(
+          `No match found. SDK response: ${JSON.stringify(
+            scanResults,
+            null,
+            2
+          )}`
+        );
       } else {
-        showLog(`Match found: ${JSON.stringify(scanResults, null, 2)}`);
+        showLog(JSON.stringify(scanResults, null, 2));
       }
 
       doneButton();
