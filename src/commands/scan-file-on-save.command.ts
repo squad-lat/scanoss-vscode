@@ -6,16 +6,12 @@ import { scanFiles } from '../utils/sdk';
 export const scanFileOnSaveCommand = async (document: vscode.TextDocument) => {
   try {
     processingButton(`Scanning ${document.uri.fsPath.split('/').at(-1)}`);
-    const { foundErrors, scanResults } = (await scanFiles(
-      [document.uri.fsPath],
-      true
-    )) as {
-      foundErrors: boolean;
-      scanResults: string;
-    };
-
+    const { foundErrors, scanResults } =
+      (await scanFiles([document.uri.fsPath], true)) || {};
     if (!foundErrors) {
-      showLog('No match found.');
+      showLog(
+        `No match found. SDK response: ${JSON.stringify(scanResults, null, 2)}`
+      );
     } else {
       showLog(JSON.stringify(scanResults, null, 2));
     }

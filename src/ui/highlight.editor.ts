@@ -17,21 +17,37 @@ export const highlightLines = async (filePath: string, lines: string) => {
       throw new Error();
     }
 
-    const lineRanges = lines.split(',');
+    let ranges: vscode.Range[];
 
-    const ranges = lineRanges.map((range) => {
-      const [startLine, endLine] = range
-        .split('-')
-        .map((line) => parseInt(line) - 1);
+    if (lines === 'all') {
+      // Highlight all lines
+      const lastLine = editor.document.lineCount - 1;
+      ranges = [
+        new vscode.Range(
+          new vscode.Position(0, 0),
+          new vscode.Position(
+            lastLine,
+            editor.document.lineAt(lastLine).text.length
+          )
+        ),
+      ];
+    } else {
+      const lineRanges = lines.split(',');
 
-      return new vscode.Range(
-        new vscode.Position(startLine, 0),
-        new vscode.Position(
-          endLine,
-          editor.document.lineAt(endLine).text.length
-        )
-      );
-    });
+      ranges = lineRanges.map((range) => {
+        const [startLine, endLine] = range
+          .split('-')
+          .map((line) => parseInt(line) - 1);
+
+        return new vscode.Range(
+          new vscode.Position(startLine, 0),
+          new vscode.Position(
+            endLine,
+            editor.document.lineAt(endLine).text.length
+          )
+        );
+      });
+    }
 
     if (activeDecorations.has(filePath)) {
       const currentDecoration = activeDecorations.get(filePath);
@@ -50,10 +66,10 @@ export const highlightLines = async (filePath: string, lines: string) => {
 
     activeDecorations.set(filePath, decorationType);
   } catch (error: any) {
-    showLog(`An error ocurred: ${error}`);
+    showLog(`An error occurred: ${error}`);
 
     throw new Error(
-      `An error ocurred when trying to highlight lines. ${error}`
+      `An error occurred when trying to highlight lines. ${error}`
     );
   }
 };
