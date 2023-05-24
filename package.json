@@ -33,7 +33,7 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint \"./**/*.{ts,tsx}\" --fix",
     "type-check": "tsc --noEmit",
-    "test": "echo 'no tests, yet... 😈",
+    "test": "echo 'no tests, yet... 😈'",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "prepare": "husky install",
     "pre-commit": "pretty-quick --staged",
