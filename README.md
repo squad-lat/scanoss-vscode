@@ -19,7 +19,6 @@ You can use the following commands from the VScode command palette:
 
 You can create a configuration file `.scanossrc` with the following options:
 
-| Option     | Default | Description                                                                                                                                        |
-| ---------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| watch      | false   | The extension will verify if the sbom.json file exists every time the project is opened and will propose the option to create and scan the project |
-| scanOnSave | true    | Every time you manually or automatically save a change to a file, a scan of the file will be performed.                                            |
+| Option     | Default | Description                                                                                             |
+| ---------- | ------- | ------------------------------------------------------------------------------------------------------- |
+| scanOnSave | true    | Every time you manually or automatically save a change to a file, a scan of the file will be performed. |

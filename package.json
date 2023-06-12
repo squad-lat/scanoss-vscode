@@ -1,8 +1,9 @@
 {
-  "name": "vscode-plugin",
-  "publisher": "scann-oss",
-  "displayName": "scanoss-vscode",
+  "name": "scanoss-vscode-plugin",
+  "publisher": "SCANOSS",
+  "displayName": "SCANOSS",
   "version": "1.0.0",
+  "icon": "media/scanoss-icon.png",
   "engines": {
     "vscode": "^1.76.0"
   },
