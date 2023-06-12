@@ -1,0 +1,14 @@
+{
+  "/Users/ataschz/work/scanoss-vscode/package.json": [
+    {
+      "id": "none",
+      "server": {
+        "version": "5.2.5",
+        "kb_version": {
+          "monthly": "23.05",
+          "daily": "23.05.29"
+        }
+      }
+    }
+  ]
+}
