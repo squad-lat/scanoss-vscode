@@ -13,6 +13,7 @@ type CheckRcConfigurationFile = {
 
 export const defaultConfig: ScanOSSConfig = {
   scanOnSave: true,
+  produceOrUpdateSbom: false,
 };
 
 export async function checkRcConfigurationFile(): Promise<CheckRcConfigurationFile> {
