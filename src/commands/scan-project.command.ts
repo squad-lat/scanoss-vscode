@@ -70,12 +70,12 @@ export const scanProjectCommand = vscode.commands.registerCommand(
           doneButton();
 
           const result = await checkIfSbomExists();
-
           const optionSelected = await vscode.window.showInformationMessage(
             result
               ? 'Do you want to update your local sbom.json file with the scan results?'
               : 'We have not detected a sbom.json file. Do you want to create it and add the scan results?',
-            ...[result ? 'Update' : 'Create and Update']
+            ...[result ? 'Update' : 'Create and Update'],
+            'Cancel'
           );
 
           if (
@@ -114,6 +114,8 @@ export const scanProjectCommand = vscode.commands.registerCommand(
             } finally {
               doneButton();
             }
+          } else if (optionSelected === 'Cancel') {
+            doneButton();
           }
         });
       }
