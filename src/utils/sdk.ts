@@ -47,7 +47,7 @@ export const scanFiles = async (
           fs.mkdirSync(dirname, { recursive: true });
         }
 
-        fs.writeFileSync(path.join(dirname, 'sbom.temp.json'), data, 'utf-8');
+        fs.writeFileSync(path.join(dirname, 'scanoss-raw.json'), data, 'utf-8');
 
         type ScanResult = {
           [scannedFilePath: string]: any[];

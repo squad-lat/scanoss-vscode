@@ -62,7 +62,11 @@ export const scanProjectCommand = vscode.commands.registerCommand(
             fs.mkdirSync(dirname, { recursive: true });
           }
 
-          fs.writeFileSync(path.join(dirname, 'sbom.temp.json'), data, 'utf-8');
+          fs.writeFileSync(
+            path.join(dirname, 'scanoss-raw.json'),
+            data,
+            'utf-8'
+          );
           doneButton();
 
           const result = await checkIfSbomExists();
