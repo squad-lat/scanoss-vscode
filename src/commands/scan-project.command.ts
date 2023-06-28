@@ -102,6 +102,7 @@ export const scanProjectCommand = vscode.commands.registerCommand(
               vscode.window.showInformationMessage(
                 'Updated sbom.json file successfully.'
               );
+              showLog(spdxDataJSON);
 
               doneButton('File updated');
             } catch (error) {
